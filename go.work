@@ -1,0 +1,9 @@
+go 1.20
+
+use (
+	./financial-service
+	./lib
+	./sales-service
+	./whse-service
+	.\utility-service\
+)
