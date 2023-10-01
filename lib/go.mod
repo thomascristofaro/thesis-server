@@ -4,6 +4,7 @@ go 1.19
 
 require (
 	github.com/aws/aws-lambda-go v1.41.0
+	github.com/aws/aws-sdk-go v1.44.151
 	github.com/awslabs/aws-lambda-go-api-proxy v0.13.3
 	gocloud.dev v0.27.0
 	gorm.io/driver/mysql v1.4.3
@@ -12,7 +13,6 @@ require (
 
 require (
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7 // indirect
-	github.com/aws/aws-sdk-go v1.44.151 // indirect
 	github.com/aws/aws-sdk-go-v2 v1.17.1 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.3 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.3 // indirect
