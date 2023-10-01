@@ -1,0 +1,67 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Service",
+            "type": "shell",
+            "command": "powershell ./../build.ps1 -service ${input:service}",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build Function",
+            "type": "shell",
+            "command": "powershell ./../build.ps1 -service ${input:service} -function ${input:function}",
+            "problemMatcher": []
+        },
+        {
+            "label": "Deploy Service",
+            "type": "shell",
+            "command": "cd ./${input:service}; serverless deploy --verbose",
+            "problemMatcher": []
+        },
+        {
+            "label": "Deploy Function",
+            "type": "shell",
+            "command": "cd ./${input:service}; serverless deploy -f ${input:function}",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build & Deploy Service",
+            "dependsOn": [
+                "Build Service",
+                "Deploy Service"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        },
+        {
+            "label": "Build & Deploy Function",
+            "dependsOn": [
+                "Build Function",
+                "Deploy Function"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": []
+        },
+    ],
+    "inputs": [
+        {
+            "id": "service",
+            "description": "Service name",
+            "type": "pickString",
+            "options": [
+                "utility-service",
+                "sales-service",
+                "whse-service",
+                "financial-service",
+            ],
+            "default": "utility-service"
+        },
+        {
+            "id": "function",
+            "description": "Function name",
+            "default": "",
+            "type": "promptString"
+        }
+    ]
+}

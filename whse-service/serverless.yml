@@ -1,7 +1,6 @@
 
 service: whse-service
 app: thesis-server
-org: thomas-cristofaro
 
 frameworkVersion: '3'
 
@@ -24,10 +23,20 @@ provider:
             - "sqs:sendmessage"
           Resource:
             - arn:aws:sqs:*:*:*
+  
+  httpApi:
+    cors: true
+    authorizers:
+      cognitoAuth:
+        type: "jwt"
+        identitySource: $request.header.Authorization
+        issuerUrl: ${file(../config.json):CognitoIssuerUrl}
+        audience:
+          - ${file(../config.json):CognitoIdClient}
 
   environment:
     OnAfterPostingShptTopicArn: !GetAtt OnAfterPostingShptTopic.TopicArn
-    ChangeOrderStatus: URL
+    ChangeOrderStatusQueueUrl: ${file(../config.json):ChangeOrderStatusQueueUrl}
 
 package:
   patterns:
@@ -35,14 +44,11 @@ package:
     - ./bin/**
 
 functions:
-  onafterpostingorder:
-    handler: bin/onafterpostingorder
+  OnAfterPostingOrder:
+    handler: bin/on-after-posting-order
     events:
-      - sqs: 
-          arn: !GetAtt TestServerlessQueue.Arn
-      # - sns:
-      #     arn: !Ref TestServerlessTopic
-      #     topicName: TestServerless
+      - sns:
+          arn: ${file(../config.json):OnAfterPostingOrderTopicArn}
 
 resources:
   Resources:
@@ -50,15 +56,6 @@ resources:
       Type: AWS::SNS::Topic
       Properties:
         TopicName: OnAfterPostingShpt
-
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+  Outputs:
+    OnAfterPostingShptTopicOutput:
+      Value: !GetAtt OnAfterPostingShptTopic.TopicArn

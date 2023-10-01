@@ -1,7 +1,6 @@
 
 service: sales-service
 app: thesis-server
-org: thomas-cristofaro
 
 frameworkVersion: '3'
 
@@ -31,9 +30,9 @@ provider:
       cognitoAuth:
         type: "jwt"
         identitySource: $request.header.Authorization
-        issuerUrl: ${file(../config.json):cognito_issuer_url}
+        issuerUrl: ${file(../config.json):CognitoIssuerUrl}
         audience:
-          - ${file(../config.json):cognito_id_client}
+          - ${file(../config.json):CognitoIdClient}
 
   environment:
     OnAfterPostingOrderTopicArn: !GetAtt OnAfterPostingOrderTopic.TopicArn

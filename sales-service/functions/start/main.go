@@ -3,12 +3,10 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"os"
+	"thesis/lib/utility"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"gocloud.dev/pubsub"
-	_ "gocloud.dev/pubsub/awssnssqs"
 )
 
 type Response events.APIGatewayProxyResponse
@@ -16,24 +14,16 @@ type Response events.APIGatewayProxyResponse
 func Handler(ctx context.Context) (Response, error) {
 	// Registro l'ordine
 
-	// lancio l'evento di registrazione ordine
-	topicARN := os.Getenv("OnAfterPostingOrderTopicArn")
-	topic, err := pubsub.OpenTopic(ctx, "awssns:///"+topicARN+"?region=us-east-1")
-	if err != nil {
-		return Response{}, err
-	}
-	defer topic.Shutdown(ctx)
-
-	err = topic.Send(ctx, &pubsub.Message{
-		Body: []byte("Hello, World!\n"),
-		// Metadata is optional and can be nil.
-		Metadata: map[string]string{
+	err := utility.SendSNSMessage(ctx,
+		"OnAfterPostingOrderTopicArn",
+		[]byte("OnAfterPostingOrder Message!"),
+		map[string]string{
 			"language":   "en",
 			"importance": "high",
-		},
-	})
+		})
+
 	if err != nil {
-		return Response{}, err
+		return Response{StatusCode: 500}, err
 	}
 
 	// risposta HTTP
@@ -41,7 +31,7 @@ func Handler(ctx context.Context) (Response, error) {
 		"message": "Go Serverless v1.0! Your function executed successfully!",
 	})
 	if err != nil {
-		return Response{StatusCode: 404}, err
+		return Response{StatusCode: 500}, err
 	}
 
 	resp := Response{
