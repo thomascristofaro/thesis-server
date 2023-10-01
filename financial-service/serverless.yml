@@ -1,7 +1,6 @@
 
 service: financial-service
 app: thesis-server
-org: thomas-cristofaro
 
 frameworkVersion: '3'
 
@@ -24,9 +23,19 @@ provider:
             - "sqs:sendmessage"
           Resource:
             - arn:aws:sqs:*:*:*
+  
+  httpApi:
+    cors: true
+    authorizers:
+      cognitoAuth:
+        type: "jwt"
+        identitySource: $request.header.Authorization
+        issuerUrl: ${file(../config.json):CognitoIssuerUrl}
+        audience:
+          - ${file(../config.json):CognitoIdClient}
 
   environment:
-    ChangeOrderStatus: URL
+    ChangeOrderStatusQueueUrl: ${file(../config.json):ChangeOrderStatusQueueUrl}
 
 package:
   patterns:
@@ -34,27 +43,8 @@ package:
     - ./bin/**
 
 functions:
-  hello:
-    handler: bin/hello
+  PostInvoice:
+    handler: bin/post-invoice
     events:
-      - httpApi:
-          path: /hello
-          method: get
-  world:
-    handler: bin/world
-    events:
-      - httpApi:
-          path: /world
-          method: get
-
-# you can add CloudFormation resource templates here
-#resources:
-#  Resources:
-#    NewResource:
-#      Type: AWS::S3::Bucket
-#      Properties:
-#        BucketName: my-new-bucket
-#  Outputs:
-#     NewOutput:
-#       Description: "Description for the output"
-#       Value: "Some output value"
+      - sns:
+          arn: ${file(../config.json):OnAfterPostingShptTopicArn}

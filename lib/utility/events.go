@@ -2,14 +2,75 @@ package utility
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
 	"os"
 	"strings"
 
+	"github.com/aws/aws-lambda-go/events"
+	"github.com/aws/aws-sdk-go/service/sqs"
 	"gocloud.dev/pubsub"
 	_ "gocloud.dev/pubsub/awssnssqs"
 )
 
-func SendSNSMessage(ctx context.Context, env_topic string, message []byte, metadata map[string]string) error {
+type Message struct {
+	Body     []byte
+	Metadata map[string]string
+}
+
+func ConvertSQSEventToMessage(sqsEvent events.SQSEvent) (Message, error) {
+	if len(sqsEvent.Records) == 0 {
+		return Message{}, errors.New("NO SQS Event")
+	}
+	if len(sqsEvent.Records) > 1 {
+		event, _ := json.Marshal(sqsEvent)
+		return Message{}, errors.New("More SQS Event: " + string(event))
+	}
+
+	sqsMessage := sqsEvent.Records[0]
+	return Message{
+		Body:     []byte(sqsMessage.Body),
+		Metadata: convertSQSAttributeToMapString(sqsMessage.MessageAttributes),
+	}, nil
+}
+
+func ConvertSNSEventToMessage(snsEvent events.SNSEvent) (Message, error) {
+	if len(snsEvent.Records) == 0 {
+		return Message{}, errors.New("NO SNS Event")
+	}
+	if len(snsEvent.Records) > 1 {
+		event, _ := json.Marshal(snsEvent)
+		return Message{}, errors.New("More SNS Event: " + string(event))
+	}
+
+	snsEntity := snsEvent.Records[0].SNS
+	return Message{
+		Body:     []byte(snsEntity.Message),
+		Metadata: convertMapInterfaceToMapString(snsEntity.MessageAttributes),
+	}, nil
+}
+
+func convertMapInterfaceToMapString(m map[string]interface{}) map[string]string {
+	result := make(map[string]string)
+	for k, v := range m {
+		if s, ok := v.(string); ok {
+			result[k] = s
+		}
+	}
+	return result
+}
+
+func convertSQSAttributeToMapString(m map[string]events.SQSMessageAttribute) map[string]string {
+	result := make(map[string]string)
+	for k, v := range m {
+		if v.DataType == "String" {
+			result[k] = *v.StringValue
+		}
+	}
+	return result
+}
+
+func SendSNSMessage(ctx context.Context, env_topic string, message Message) error {
 	topicARN := os.Getenv(env_topic)
 	topic, err := pubsub.OpenTopic(ctx, "awssns:///"+topicARN+"?region=us-east-1")
 	if err != nil {
@@ -18,9 +79,9 @@ func SendSNSMessage(ctx context.Context, env_topic string, message []byte, metad
 	defer topic.Shutdown(ctx)
 
 	err = topic.Send(ctx, &pubsub.Message{
-		Body: message,
+		Body: message.Body,
 		// Metadata is optional and can be nil.
-		Metadata: metadata,
+		Metadata: message.Metadata,
 	})
 	if err != nil {
 		return err
@@ -29,7 +90,7 @@ func SendSNSMessage(ctx context.Context, env_topic string, message []byte, metad
 	return nil
 }
 
-func SendSQSMessage(ctx context.Context, env_topic string, message []byte, metadata map[string]string) error {
+func SendSQSMessage(ctx context.Context, env_topic string, message Message, fifo bool) error {
 	queueURL := os.Getenv(env_topic)
 	if strings.HasPrefix(queueURL, "https://") {
 		queueURL = queueURL[8:]
@@ -40,10 +101,23 @@ func SendSQSMessage(ctx context.Context, env_topic string, message []byte, metad
 	}
 	defer topic.Shutdown(ctx)
 
+	var beforeSend func(asFunc func(interface{}) bool) error
+	if fifo {
+		beforeSend = func(asFunc func(interface{}) bool) error {
+			var smi *sqs.SendMessageInput
+			if asFunc(&smi) {
+				str := "default"
+				(*smi).MessageGroupId = &str
+			}
+			return nil
+		}
+	}
+
 	err = topic.Send(ctx, &pubsub.Message{
-		Body: message,
+		Body: message.Body,
 		// Metadata is optional and can be nil.
-		Metadata: metadata,
+		Metadata:   message.Metadata,
+		BeforeSend: beforeSend,
 	})
 	if err != nil {
 		return err

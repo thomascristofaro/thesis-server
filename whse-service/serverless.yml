@@ -44,8 +44,8 @@ package:
     - ./bin/**
 
 functions:
-  OnAfterPostingOrder:
-    handler: bin/on-after-posting-order
+  PostShipment:
+    handler: bin/post-shipment
     events:
       - sns:
           arn: ${file(../config.json):OnAfterPostingOrderTopicArn}

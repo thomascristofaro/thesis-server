@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"strconv"
 	"thesis/lib/utility"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -14,21 +15,33 @@ type Response events.APIGatewayProxyResponse
 func Handler(ctx context.Context) (Response, error) {
 	// Registro l'ordine
 
-	err := utility.SendSNSMessage(ctx,
-		"OnAfterPostingOrderTopicArn",
-		[]byte("OnAfterPostingOrder Message!"),
-		map[string]string{
-			"language":   "en",
-			"importance": "high",
+	for i := 0; i < 10; i++ {
+		body, err := json.Marshal(map[string]interface{}{
+			"order_id": "OR" + strconv.Itoa(i),
+			"event":    "OnAfterPostingOrder",
 		})
+		if err != nil {
+			return Response{StatusCode: 500}, err
+		}
+		message := utility.Message{
+			Body: body,
+			Metadata: map[string]string{
+				"device_id": "XXXXXXXX",
+			},
+		}
 
-	if err != nil {
-		return Response{StatusCode: 500}, err
+		err = utility.SendSNSMessage(ctx,
+			"OnAfterPostingOrderTopicArn",
+			message)
+
+		if err != nil {
+			return Response{StatusCode: 500}, err
+		}
 	}
 
 	// risposta HTTP
 	body, err := json.Marshal(map[string]interface{}{
-		"message": "Go Serverless v1.0! Your function executed successfully!",
+		"message": "SNS Message Sent!",
 	})
 	if err != nil {
 		return Response{StatusCode: 500}, err
@@ -39,8 +52,7 @@ func Handler(ctx context.Context) (Response, error) {
 		IsBase64Encoded: false,
 		Body:            string(body),
 		Headers: map[string]string{
-			"Content-Type":           "application/json",
-			"X-MyCompany-Func-Reply": "hello-handler",
+			"Content-Type": "application/json",
 		},
 	}
 

@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"thesis/lib/utility"
 
@@ -10,22 +11,32 @@ import (
 )
 
 func Handler(ctx context.Context, snsEvent events.SNSEvent) error {
-	for _, record := range snsEvent.Records {
-		snsRecord := record.SNS
-		fmt.Printf("[%s %s] Message = %s \n", record.EventSource, snsRecord.Timestamp, snsRecord.Message)
+	message, err := utility.ConvertSNSEventToMessage(snsEvent)
+	if err != nil {
+		return err
 	}
+	fmt.Printf("Message: %s", message.Body)
 
 	// registra spedizione
+	var v map[string]interface{}
+	json.Unmarshal(message.Body, &v)
+	v["event"] = "ChangeOrderStatusFromShpt"
+	message.Body, err = json.Marshal(v)
+	if err != nil {
+		return err
+	}
 
 	// cambia stato ordine
-	err := utility.SendSQSMessage(ctx,
+	err = utility.SendSQSMessage(ctx,
 		"ChangeOrderStatusQueueUrl",
-		[]byte("ChangeOrderStatus Message!"),
-		map[string]string{
-			"language":   "en",
-			"importance": "high",
-		})
+		message, true)
 
+	if err != nil {
+		return err
+	}
+
+	v["event"] = "OnAfterPostingShpt"
+	message.Body, err = json.Marshal(v)
 	if err != nil {
 		return err
 	}
@@ -33,11 +44,7 @@ func Handler(ctx context.Context, snsEvent events.SNSEvent) error {
 	// chiama evento post spedizione
 	err = utility.SendSNSMessage(ctx,
 		"OnAfterPostingShptTopicArn",
-		[]byte("OnAfterPostingShpt Message!"),
-		map[string]string{
-			"language":   "en",
-			"importance": "high",
-		})
+		message)
 
 	if err != nil {
 		return err

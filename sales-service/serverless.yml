@@ -54,6 +54,7 @@ functions:
     events:
       - sqs:
           arn: !GetAtt ChangeOrderStatusQueue.Arn
+          batchSize: 1
 
 resources:
   Resources:
@@ -64,7 +65,9 @@ resources:
     ChangeOrderStatusQueue:
       Type: AWS::SQS::Queue
       Properties:
-        QueueName: ChangeOrderStatus
+        QueueName: ChangeOrderStatus.fifo
+        FifoQueue: true
+        ContentBasedDeduplication: true
 
 # you can add CloudFormation resource templates here
 #resources:
