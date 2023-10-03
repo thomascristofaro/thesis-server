@@ -2,6 +2,7 @@ package database
 
 import (
 	"context"
+	"errors"
 	"reflect"
 	"strings"
 )
@@ -49,9 +50,8 @@ type ModelCtrl struct {
 	// xDbModel interface{}
 	filters []Filter
 	lastErr error
-	DBSQL   DatabaseSQL
 	db      Database
-	conn    ConnectionParameters
+	Conn    ConnectionParameters
 	it      IteratorDB
 }
 
@@ -70,7 +70,7 @@ func FillNameFields(a interface{}) {
 	}
 }
 
-func NewModel(model ModelDB, conn ConnectionParameters) ModelCtrl {
+func NewModel(model ModelDB) ModelCtrl {
 	var db Database
 	var dbSQL DatabaseSQL
 	switch model.DBType() {
@@ -86,9 +86,7 @@ func NewModel(model ModelDB, conn ConnectionParameters) ModelCtrl {
 		Name:  name,
 		Model: model,
 		// xDbModel: dbModel,
-		db:    db,
-		conn:  conn,
-		DBSQL: dbSQL,
+		db: db,
 	}
 }
 
@@ -163,7 +161,11 @@ func (m *ModelCtrl) Next() bool {
 }
 
 func (m *ModelCtrl) Open() bool {
-	m.lastErr = m.db.Open(m.conn)
+	if m.Conn == nil {
+		m.lastErr = errors.New("connection parameters not set")
+		return false
+	}
+	m.lastErr = m.db.Open(m.Conn)
 	return m.lastErr == nil
 }
 

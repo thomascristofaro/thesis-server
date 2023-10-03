@@ -32,8 +32,8 @@ func NewBasePage(pageImpl interface{}, caption string, pagetype PageType, CardPa
 	}
 }
 
-func (p *BasePage) AddModel(model database.ModelDB, conn database.ConnectionParameters) {
-	p.ModelCtrl = database.NewModel(model, conn)
+func (p *BasePage) AddModel(model database.ModelDB) {
+	p.ModelCtrl = database.NewModel(model)
 }
 
 func (p *BasePage) AddButton(b *Button) {
@@ -47,10 +47,6 @@ func (p *BasePage) AddSection(s *Section) {
 func (p *BasePage) AddKey(s string) {
 	p.Keys = append(p.Keys, s)
 }
-
-// func (p *Page) AddRepeater(s *Section) {
-// 	p.Area["repeater"] = s
-// }
 
 func (p *BasePage) GetId() string {
 	return p.Id

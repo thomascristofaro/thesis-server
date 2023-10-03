@@ -4,6 +4,7 @@ use (
 	./financial-service
 	./lib
 	./sales-service
+	./test-service
 	./whse-service
-	.\utility-service\
+	./utility-service
 )
