@@ -15,11 +15,11 @@ func main() {
 	config := readConfig()
 
 	dbconn := database.ConnParamSQL{
-		Host: config["RDSHost"].(string),
-		Port: int(config["RDSPort"].(float64)),
+		Host: config["DBHost"].(string),
+		Port: int(config["DBPort"].(float64)),
 		Name: "utility",
-		User: config["RDSUser"].(string),
-		Psw:  config["RDSPass"].(string),
+		User: config["DBUser"].(string),
+		Psw:  config["DBPass"].(string),
 	}
 	createTables(&dbconn, []database.ModelDB{models.Navigation{}, models.Log{}})
 

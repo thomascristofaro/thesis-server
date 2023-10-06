@@ -9,7 +9,6 @@ provider:
   runtime: go1.x
   stage: dev
   region: us-east-1
-
   iam:
     role:
       statements:
@@ -23,7 +22,6 @@ provider:
             - "sqs:sendmessage"
           Resource:
             - arn:aws:sqs:*:*:*
-  
   httpApi:
     cors: true
     authorizers:
@@ -35,11 +33,11 @@ provider:
           - ${file(../config.json):CognitoIdClient}
 
   environment:
-    RDSHost: ${file(../config.json):RDSHost}
-    RDSPort: ${file(../config.json):RDSPort}
-    RDSUser: ${file(../config.json):RDSUser}
-    RDSPass: ${file(../config.json):RDSPass}
-    RDSName: ${file(./config.json):RDSName}
+    DBHost: ${file(../config.json):DBHost}
+    DBPort: ${file(../config.json):DBPort}
+    DBUser: ${file(../config.json):DBUser}
+    DBPass: ${file(../config.json):DBPass}
+    DBName: ${file(./config.json):DBName}
 
 package:
   patterns:
@@ -47,6 +45,53 @@ package:
     - ./bin/**
 
 functions:
+  Home:
+    handler: bin/home
+    events:
+    - httpApi:
+        path: /home/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  NavigationList:
+    handler: bin/navigation-list
+    events:
+    - httpApi:
+        path: /navigationlist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  NavigationCard:
+    handler: bin/navigation-card
+    events:
+    - httpApi:
+        path: /navigationcard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /navigationcard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /navigationcard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /navigationcard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
+  LogList:
+    handler: bin/log-list
+    events:
+    - httpApi:
+        path: /loglist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
   LogMessage:
     handler: bin/log-message
     events:

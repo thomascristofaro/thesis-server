@@ -3,8 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"os"
-	"strconv"
 	"thesis/lib/database"
 	"thesis/lib/utility"
 	"thesis/utility-service/models"
@@ -16,15 +14,6 @@ import (
 func LogMessage(message utility.Message, function string, event string) error {
 	m := database.NewModel(models.NewLog())
 	b, _ := json.Marshal(message.Metadata)
-
-	port, _ := strconv.Atoi(os.Getenv("RDSPort"))
-	m.Conn = &database.ConnParamSQL{
-		Host: os.Getenv("RDSHost"),
-		Port: port,
-		Name: os.Getenv("RDSName"),
-		User: os.Getenv("RDSUser"),
-		Psw:  os.Getenv("RDSPass"),
-	}
 
 	m.Open()
 	model := m.Model.(*models.Log)

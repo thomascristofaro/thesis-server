@@ -6,6 +6,8 @@ import (
 	"database/sql/driver"
 	"errors"
 	"fmt"
+	"os"
+	"strconv"
 
 	gosql "gocloud.dev/mysql"
 	"gorm.io/driver/mysql"
@@ -27,6 +29,17 @@ func NewConnParamSQL(host string, port int, name string, user string, psw string
 		Name: name,
 		User: user,
 		Psw:  psw,
+	}
+}
+
+func NewConnParamSQLFromEnv() ConnectionParameters {
+	port, _ := strconv.Atoi(os.Getenv("DBPort"))
+	return &ConnParamSQL{
+		Host: os.Getenv("DBHost"),
+		Port: port,
+		Name: os.Getenv("DBName"),
+		User: os.Getenv("DBUser"),
+		Psw:  os.Getenv("DBPass"),
 	}
 }
 

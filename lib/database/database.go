@@ -73,8 +73,10 @@ func FillNameFields(a interface{}) {
 func NewModel(model ModelDB) ModelCtrl {
 	var db Database
 	var dbSQL DatabaseSQL
+	var conn ConnectionParameters
 	switch model.DBType() {
 	case SQL:
+		conn = NewConnParamSQLFromEnv()
 		dbSQL = DatabaseSQL{}
 		db = &dbSQL
 	case NOSQL:
@@ -85,6 +87,7 @@ func NewModel(model ModelDB) ModelCtrl {
 	return ModelCtrl{
 		Name:  name,
 		Model: model,
+		Conn:  conn,
 		// xDbModel: dbModel,
 		db: db,
 	}
