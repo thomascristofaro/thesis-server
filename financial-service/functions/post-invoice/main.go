@@ -20,7 +20,8 @@ func Handler(ctx context.Context, snsEvent events.SNSEvent) error {
 	// registra fattura
 	var v map[string]interface{}
 	json.Unmarshal(message.Body, &v)
-	v["event"] = "ChangeOrderStatusFromInvoice"
+	v["event"] = "ChangeOrderStatus: Invoice"
+	v["function"] = "PostInvoice"
 	message.Body, err = json.Marshal(v)
 	if err != nil {
 		return err

@@ -35,6 +35,11 @@ provider:
           - ${file(../config.json):CognitoIdClient}
 
   environment:
+    DBHost: ${file(../config.json):DBHost}
+    DBPort: ${file(../config.json):DBPort}
+    DBUser: ${file(../config.json):DBUser}
+    DBPass: ${file(../config.json):DBPass}
+    DBName: ${file(./config.json):DBName}
     OnAfterPostingShptTopicArn: !GetAtt OnAfterPostingShptTopic.TopicArn
     ChangeOrderStatusQueueUrl: ${file(../config.json):ChangeOrderStatusQueueUrl}
 
@@ -44,6 +49,68 @@ package:
     - ./bin/**
 
 functions:
+  ShipmentList:
+    handler: bin/shipment-list
+    events:
+    - httpApi:
+        path: /shipmentlist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  ShipmentCard:
+    handler: bin/shipment-card
+    events:
+    - httpApi:
+        path: /shipmentcard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /shipmentcard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /shipmentcard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /shipmentcard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
+  ShipmentLineList:
+    handler: bin/shipment-line-list
+    events:
+    - httpApi:
+        path: /shipmentlinelist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  ShipmentLineCard:
+    handler: bin/shipment-line-card
+    events:
+    - httpApi:
+        path: /shipmentlinecard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /shipmentlinecard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /shipmentlinecard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /shipmentlinecard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
   PostShipment:
     handler: bin/post-shipment
     events:

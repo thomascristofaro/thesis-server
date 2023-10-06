@@ -35,6 +35,11 @@ provider:
           - ${file(../config.json):CognitoIdClient}
 
   environment:
+    DBHost: ${file(../config.json):DBHost}
+    DBPort: ${file(../config.json):DBPort}
+    DBUser: ${file(../config.json):DBUser}
+    DBPass: ${file(../config.json):DBPass}
+    DBName: ${file(./config.json):DBName}
     OnAfterPostingOrderTopicArn: !GetAtt OnAfterPostingOrderTopic.TopicArn
 
 package:
@@ -43,6 +48,99 @@ package:
     - ./bin/**
 
 functions:
+  CustomerList:
+    handler: bin/customer-list
+    events:
+    - httpApi:
+        path: /customerlist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  CustomerCard:
+    handler: bin/customer-card
+    events:
+    - httpApi:
+        path: /customercard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /customercard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /customercard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /customercard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
+  SalesOrderList:
+    handler: bin/sales-order-list
+    events:
+    - httpApi:
+        path: /salesorderlist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  SalesOrderCard:
+    handler: bin/sales-order-card
+    events:
+    - httpApi:
+        path: /salesordercard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /salesordercard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /salesordercard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /salesordercard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
+  SalesOrderLineList:
+    handler: bin/sales-order-line-list
+    events:
+    - httpApi:
+        path: /salesorderlinelist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  SalesOrderLineCard:
+    handler: bin/sales-order-line-card
+    events:
+    - httpApi:
+        path: /salesorderlinecard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /salesorderlinecard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /salesorderlinecard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /salesorderlinecard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
   Start:
     handler: bin/start
     events:

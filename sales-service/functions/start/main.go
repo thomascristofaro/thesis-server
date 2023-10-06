@@ -15,10 +15,11 @@ type Response events.APIGatewayProxyResponse
 func Handler(ctx context.Context) (Response, error) {
 	// Registro l'ordine
 
-	for i := 0; i < 10; i++ {
+	for i := 1; i < 3; i++ {
 		body, err := json.Marshal(map[string]interface{}{
 			"order_id": "OR" + strconv.Itoa(i),
 			"event":    "OnAfterPostingOrder",
+			"function": "start",
 		})
 		if err != nil {
 			return Response{StatusCode: 500}, err

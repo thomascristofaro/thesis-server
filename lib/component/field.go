@@ -18,6 +18,8 @@ func NewField(id string, caption string, value interface{}) Field {
 		fieldType = IntType
 	case *float64:
 		fieldType = DecimalType
+	case *uint:
+		fieldType = IntType
 	default:
 		fmt.Printf("Tipo sconosciuto %T", v)
 	}

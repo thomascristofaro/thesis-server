@@ -7,21 +7,20 @@ import (
 	"reflect"
 	"strings"
 	"thesis/lib/database"
-	"thesis/utility-service/models"
 )
 
 func main() {
 
-	config := readConfig()
+	// config := readConfig()
 
-	dbconn := database.ConnParamSQL{
-		Host: config["DBHost"].(string),
-		Port: int(config["DBPort"].(float64)),
-		Name: "utility",
-		User: config["DBUser"].(string),
-		Psw:  config["DBPass"].(string),
-	}
-	createTables(&dbconn, []database.ModelDB{models.Navigation{}, models.Log{}})
+	// dbconn := database.ConnParamSQL{
+	// 	Host: config["DBHost"].(string),
+	// 	Port: int(config["DBPort"].(float64)),
+	// 	Name: "financial",
+	// 	User: config["DBUser"].(string),
+	// 	Psw:  config["DBPass"].(string),
+	// }
+	// createTables(&dbconn, []database.ModelDB{models.InvoiceHeader{}, models.InvoiceLine{}})
 
 }
 

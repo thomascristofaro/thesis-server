@@ -30,6 +30,9 @@ func NewNavigationList() *NavigationList {
 		component.NewField("PageId", "Page ID", &c.Model.PageId),
 		component.NewField("Caption", "Caption", &c.Model.Caption),
 		component.NewField("URL", "URL", &c.Model.URL),
+		component.NewField("Icon", "Icon", &c.Model.Icon),
+		component.NewField("SelectedIcon", "Selected Icon", &c.Model.SelectedIcon),
+		component.NewField("Tooltip", "Tooltip", &c.Model.Tooltip),
 	))
 	return c
 }

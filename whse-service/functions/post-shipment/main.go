@@ -20,7 +20,8 @@ func Handler(ctx context.Context, snsEvent events.SNSEvent) error {
 	// registra spedizione
 	var v map[string]interface{}
 	json.Unmarshal(message.Body, &v)
-	v["event"] = "ChangeOrderStatusFromShpt"
+	v["event"] = "ChangeOrderStatus: Shipped"
+	v["function"] = "PostShipment"
 	message.Body, err = json.Marshal(v)
 	if err != nil {
 		return err

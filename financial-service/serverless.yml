@@ -35,6 +35,11 @@ provider:
           - ${file(../config.json):CognitoIdClient}
 
   environment:
+    DBHost: ${file(../config.json):DBHost}
+    DBPort: ${file(../config.json):DBPort}
+    DBUser: ${file(../config.json):DBUser}
+    DBPass: ${file(../config.json):DBPass}
+    DBName: ${file(./config.json):DBName}
     ChangeOrderStatusQueueUrl: ${file(../config.json):ChangeOrderStatusQueueUrl}
 
 package:
@@ -43,6 +48,68 @@ package:
     - ./bin/**
 
 functions:
+  InvoiceList:
+    handler: bin/invoice-list
+    events:
+    - httpApi:
+        path: /invoicelist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  InvoiceCard:
+    handler: bin/invoice-card
+    events:
+    - httpApi:
+        path: /invoicecard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /invoicecard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /invoicecard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /invoicecard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
+  InvoiceLineList:
+    handler: bin/invoice-line-list
+    events:
+    - httpApi:
+        path: /invoicelinelist/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+  InvoiceLineCard:
+    handler: bin/invoice-line-card
+    events:
+    - httpApi:
+        path: /invoicelinecard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /invoicelinecard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /invoicelinecard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /invoicelinecard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
   PostInvoice:
     handler: bin/post-invoice
     events:
