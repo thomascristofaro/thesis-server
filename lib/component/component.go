@@ -44,6 +44,7 @@ type Page interface {
 	Post(body []byte) ([]byte, error)
 	Patch(body []byte) ([]byte, error)
 	Delete(filters map[string][]string) ([]byte, error)
+	Button(queryParams map[string][]string) ([]byte, error)
 	GetId() string
 }
 
@@ -57,12 +58,24 @@ func PageEntryPoint(w http.ResponseWriter, r *http.Request, page Page) error {
 	}
 
 	if len(path) == 2 {
-		if (path[1] == "schema") && (r.Method == http.MethodGet) {
-			s, err := page.GetSchema()
-			if err != nil {
-				return err
+		if r.Method == http.MethodGet {
+			switch path[1] {
+			case "schema":
+				s, err := page.GetSchema()
+				if err != nil {
+					return err
+				}
+				return responseByValue(w, s)
+			case "button":
+				s, err := page.Button(r.URL.Query())
+				if err != nil {
+					return err
+				}
+				return responseByValue(w, s)
+			default:
+				http.Error(w, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
+				return nil
 			}
-			return responseByValue(w, s)
 		} else {
 			// http.Error(w, "405 - Method Not Allowed", http.StatusMethodNotAllowed)
 			// return nil

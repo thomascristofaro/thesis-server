@@ -48,7 +48,7 @@ func (connParam *ConnParamSQL) getURL() (string, error) {
 	if err := connParam.checkParameters(); err != nil {
 		return "", err
 	}
-	return fmt.Sprintf("mysql://%s:%s@%s:%d/%s",
+	return fmt.Sprintf("mysql://%s:%s@%s:%d/%s?parseTime=true",
 		connParam.User, connParam.Psw, connParam.Host, connParam.Port, connParam.Name), nil
 }
 

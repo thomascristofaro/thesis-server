@@ -6,6 +6,8 @@ import (
 	"reflect"
 	"strings"
 	"thesis/lib/database"
+
+	"golang.org/x/exp/slices"
 )
 
 type BasePage struct {
@@ -68,7 +70,8 @@ func (p *BasePage) Get(filters map[string][]string) ([]byte, error) {
 	p.ModelCtrl.SetFilters(filters)
 	if p.ModelCtrl.Find() {
 		for p.ModelCtrl.Next() {
-			data = append(data, GetSectionFieldsValue(p.Area[0]))
+			record := GetAllSectionsFieldsValue(p.Area)
+			data = append(data, record)
 		}
 	}
 	p.ModelCtrl.Close()
@@ -122,5 +125,21 @@ func (p *BasePage) Delete(filters map[string][]string) ([]byte, error) {
 		return nil, p.ModelCtrl.GetLastError()
 	}
 	p.ModelCtrl.Close()
+	return json.Marshal("OK")
+}
+
+func (p *BasePage) Button(queryParams map[string][]string) ([]byte, error) {
+	var idSlices []string
+	var ok bool
+	if idSlices, ok = queryParams["button_id"]; !ok {
+		return nil, errors.New("button_id not found in query parameters")
+	}
+	id := idSlices[0]
+	bIdx := slices.IndexFunc(p.Buttons, func(b Button) bool { return b.Id == id })
+	b := p.Buttons[bIdx]
+	err := b.Function(p, queryParams)
+	if err != nil {
+		return nil, err
+	}
 	return json.Marshal("OK")
 }

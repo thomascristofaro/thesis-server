@@ -11,8 +11,14 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func LogMessage(message utility.Message, function string, event string) error {
+func LogMessage(message utility.Message) error {
 	m := database.NewModel(models.NewLog())
+
+	function := message.Metadata["function"]
+	event := message.Metadata["event"]
+	delete(message.Metadata, "function")
+	delete(message.Metadata, "event")
+
 	b, _ := json.Marshal(message.Metadata)
 
 	m.Open()
@@ -35,7 +41,7 @@ func main() {
 		if err != nil {
 			return err
 		}
-		err = LogMessage(message, "log-message", "on-log-message")
+		err = LogMessage(message)
 		return nil
 	})
 }

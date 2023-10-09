@@ -40,6 +40,7 @@ provider:
     DBUser: ${file(../config.json):DBUser}
     DBPass: ${file(../config.json):DBPass}
     DBName: ${file(./config.json):DBName}
+    LogMessageQueueUrl: ${file(../config.json):LogMessageQueueUrl}
     OnAfterPostingOrderTopicArn: !GetAtt OnAfterPostingOrderTopic.TopicArn
 
 package:

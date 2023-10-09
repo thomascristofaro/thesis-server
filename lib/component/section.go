@@ -46,3 +46,20 @@ func GetSectionFieldsValue(s Section) map[string]interface{} {
 	}
 	return m
 }
+
+func GetAllSectionsFieldsValue(sec []Section) map[string]interface{} {
+	m := make(map[string]interface{})
+	for _, s := range sec {
+		if (s.Type == Repeater) || (s.Type == Group) {
+			for _, f := range s.Fields {
+				v := reflect.ValueOf(f.Value)
+				if v.Kind() == reflect.Ptr {
+					m[f.Id] = v.Elem().Interface()
+				} else {
+					m[f.Id] = f.Value
+				}
+			}
+		}
+	}
+	return m
+}

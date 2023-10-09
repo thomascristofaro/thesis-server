@@ -71,6 +71,10 @@ func convertSQSAttributeToMapString(m map[string]events.SQSMessageAttribute) map
 }
 
 func SendSNSMessage(ctx context.Context, env_topic string, message Message) error {
+	if err := sendSQSLog(ctx, message); err != nil {
+		return err
+	}
+
 	topicARN := os.Getenv(env_topic)
 	topic, err := pubsub.OpenTopic(ctx, "awssns:///"+topicARN+"?region=us-east-1")
 	if err != nil {
@@ -91,6 +95,22 @@ func SendSNSMessage(ctx context.Context, env_topic string, message Message) erro
 }
 
 func SendSQSMessage(ctx context.Context, env_topic string, message Message, fifo bool) error {
+	if err := sendSQSLog(ctx, message); err != nil {
+		return err
+	}
+	return sendSQSMessageWithoutLog(ctx, env_topic, message, fifo)
+}
+
+func sendSQSLog(ctx context.Context, message Message) error {
+	if logURL, ok := os.LookupEnv("LogMessageQueueUrl"); ok {
+		if err := sendSQSMessageWithoutLog(ctx, logURL, message, true); err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func sendSQSMessageWithoutLog(ctx context.Context, env_topic string, message Message, fifo bool) error {
 	queueURL := os.Getenv(env_topic)
 	if strings.HasPrefix(queueURL, "https://") {
 		queueURL = queueURL[8:]

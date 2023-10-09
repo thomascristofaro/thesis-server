@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-sdk-go v1.44.151
 	github.com/awslabs/aws-lambda-go-api-proxy v0.13.3
 	gocloud.dev v0.27.0
+	golang.org/x/exp v0.0.0-20221031165847-c99f073a8326
 	gorm.io/driver/mysql v1.4.3
 	gorm.io/gorm v1.24.1
 )
