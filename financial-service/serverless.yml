@@ -115,4 +115,4 @@ functions:
     handler: bin/post-invoice
     events:
       - sns:
-          arn: ${file(../config.json):OnAfterPostingShptTopicArn}
+          arn: ${file(../config.json):OnPostInvoiceTopicArn}

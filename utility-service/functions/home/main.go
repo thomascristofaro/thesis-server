@@ -24,8 +24,8 @@ type Home struct {
 func NewHome() *Home {
 	c := &Home{}
 	c.BasePage = *component.NewBasePage(c, "Home Page", component.Home, "")
-	c.AddSection(component.NewSection("pie_chart_1", component.PieChart, "Pie Chart di test"))
-	sec := component.NewSection("line_chart_1", component.LineChart, "Line Chart di test")
+	c.AddSection(component.NewSection("pie_chart_1", component.PieChart, "Distribuzione degli Ordini per Cliente"))
+	sec := component.NewSection("line_chart_1", component.LineChart, "Andamento Mensile degli Ordini")
 
 	x_obj := map[string]interface{}{"min": 0, "max": 11}
 	var data []map[string]interface{}

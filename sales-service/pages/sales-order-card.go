@@ -74,56 +74,81 @@ func (p *SalesOrderCard) Button(queryParams map[string][]string) ([]byte, error)
 	id := idSlices[0]
 	bIdx := slices.IndexFunc(p.Buttons, func(b component.Button) bool { return b.Id == id })
 	b := p.Buttons[bIdx]
-	err := b.Function(p, queryParams)
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal("OK")
+	return b.Function(p, queryParams)
 }
 
-func PostSalesOrder(page component.Page, queryParams map[string][]string) error {
+func PostSalesOrder(page component.Page, queryParams map[string][]string) ([]byte, error) {
 	p := page.(*SalesOrderCard)
 
+	// Handle Button
 	device_id := queryParams["device_id"][0]
 	delete(queryParams, "button_id")
 	delete(queryParams, "device_id")
 
+	// Search record
 	if !p.ModelCtrl.Open() {
-		return p.ModelCtrl.GetLastError()
+		return nil, p.ModelCtrl.GetLastError()
 	}
 
 	p.ModelCtrl.SetFilters(queryParams)
 	if p.ModelCtrl.Find() {
 		if !p.ModelCtrl.Next() {
-			return errors.New("No record found")
+			return nil, errors.New("No record found")
 		}
 	}
 	p.ModelCtrl.Close()
 
+	// Build message
 	body, err := json.Marshal(map[string]interface{}{
 		"No": p.Model.No,
 	})
 	if err != nil {
-		return err
+		return nil, err
+	}
+	metadata := map[string]string{
+		"device_id": device_id,
+		"function":  "PostSalesOrder",
+		"service":   "SNS",
 	}
 
-	message := utility.Message{
-		Body: body,
-		Metadata: map[string]string{
-			"device_id": device_id,
-			"function":  "PostSalesOrder",
-			"event":     "OnAfterPostingOrder",
-		},
+	// registra spedizione
+	if p.Model.Status == "" || p.Model.Status == "INIT" {
+		metadata["event"] = "OnPostShipment"
+
+		// TODO è da costruire il body per la spedizione
+
+		// Send event to SNS
+		ctx := context.Background()
+		err = utility.SendSNSMessage(ctx,
+			"OnPostShipmentTopicArn",
+			utility.Message{
+				Body:     body,
+				Metadata: metadata,
+			})
+		if err != nil {
+			return nil, err
+		}
+		return json.Marshal("In registrazione spedizione")
 	}
 
-	ctx := context.Background()
-	err = utility.SendSNSMessage(ctx,
-		"OnAfterPostingOrderTopicArn",
-		message)
+	// registra fattura
+	if p.Model.Status == "SPED" {
+		metadata["event"] = "OnPostInvoice"
 
-	if err != nil {
-		return err
+		// TODO è da costruire il body per la fattura
+
+		// Send event to SNS
+		ctx := context.Background()
+		err = utility.SendSNSMessage(ctx,
+			"OnPostInvoiceTopicArn",
+			utility.Message{
+				Body:     body,
+				Metadata: metadata,
+			})
+		if err != nil {
+			return nil, err
+		}
+		return json.Marshal("In registrazione fattura")
 	}
-
-	return nil
+	return json.Marshal("OK")
 }

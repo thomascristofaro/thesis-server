@@ -13,7 +13,23 @@ require (
 )
 
 require (
+	cloud.google.com/go v0.107.0 // indirect
+	cloud.google.com/go/compute v1.13.0 // indirect
+	cloud.google.com/go/compute/metadata v0.2.2 // indirect
+	cloud.google.com/go/firestore v1.9.0 // indirect
+	cloud.google.com/go/iam v0.7.0 // indirect
+	cloud.google.com/go/longrunning v0.3.0 // indirect
+	cloud.google.com/go/storage v1.28.0 // indirect
+	github.com/google/go-cmp v0.5.9 // indirect
+	github.com/googleapis/enterprise-certificate-proxy v0.2.0 // indirect
+	golang.org/x/oauth2 v0.2.0 // indirect
+	golang.org/x/time v0.2.0 // indirect
+	google.golang.org/appengine v1.6.7 // indirect
+)
+
+require (
 	contrib.go.opencensus.io/integrations/ocsql v0.1.7 // indirect
+	firebase.google.com/go v3.13.0+incompatible
 	github.com/aws/aws-sdk-go-v2 v1.17.1 // indirect
 	github.com/aws/aws-sdk-go-v2/config v1.18.3 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.13.3 // indirect

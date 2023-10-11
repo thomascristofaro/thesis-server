@@ -14,20 +14,25 @@ import (
 
 func main() {
 
-	config := readConfig()
+	readConfig()
+	os.Setenv("DBName", "sales")
 
-	dbconn := database.ConnParamSQL{
-		Host: config["DBHost"].(string),
-		Port: int(config["DBPort"].(float64)),
-		Name: "sales",
-		User: config["DBUser"].(string),
-		Psw:  config["DBPass"].(string),
+	// createTables(database.NewConnParamSQLFromEnv(), []database.ModelDB{models.Log{}})
+
+	page := pages.NewSalesOrderCard()
+	queryParams := map[string][]string{
+		"device_id": []string{"eKtDSgRajJNmpcgKSQDTod:APA91bEE-t0pxZpNS5uG4jQEkV0I0P58fBBavNf9MldWxVp8xQJunv5UR7tReQ_seAWK1IxsdrinYANyqies47tmKpNStemyFTccwZiJJ8itsACJBQYlMVTw_rfG5ZO-_iIdgX5Y_QEZ"},
+		"No":        []string{"OR0001"},
 	}
-	// createTables(&dbconn, []database.ModelDB{models.InvoiceHeader{}, models.InvoiceLine{}})
-	var filters map[string][]string
-	page := pages.NewSalesOrderList()
-	page.ModelCtrl.Conn = &dbconn
-	TestGetPage(page, filters)
+	buff, err := pages.PostSalesOrder(page, queryParams)
+	if err != nil {
+		fmt.Println(err)
+	} else {
+		fmt.Println(string(buff))
+	}
+
+	// var filters map[string][]string
+	// TestGetPage(page, filters)
 }
 
 // config["foo"].(string)
@@ -43,6 +48,13 @@ func readConfig() map[string]interface{} {
 	err = json.Unmarshal(data, &config)
 	if err != nil {
 		log.Fatalf("Errore lettura file di configurazione " + err.Error())
+	}
+
+	// Set environment variables
+	for key, value := range config {
+		if err := os.Setenv(key, fmt.Sprintf("%v", value)); err != nil {
+			log.Fatalf("Errore impostazione variabile di ambiente " + err.Error())
+		}
 	}
 	return config
 }

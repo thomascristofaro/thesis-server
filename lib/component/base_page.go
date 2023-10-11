@@ -137,9 +137,5 @@ func (p *BasePage) Button(queryParams map[string][]string) ([]byte, error) {
 	id := idSlices[0]
 	bIdx := slices.IndexFunc(p.Buttons, func(b Button) bool { return b.Id == id })
 	b := p.Buttons[bIdx]
-	err := b.Function(p, queryParams)
-	if err != nil {
-		return nil, err
-	}
-	return json.Marshal("OK")
+	return b.Function(p, queryParams)
 }

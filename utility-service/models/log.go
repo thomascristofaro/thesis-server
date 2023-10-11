@@ -10,6 +10,7 @@ type Log struct {
 	gorm.Model
 	Function   string
 	Event      string
+	Service    string
 	Attributes string
 	Body       string
 }

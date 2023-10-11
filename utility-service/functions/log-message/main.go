@@ -16,8 +16,11 @@ func LogMessage(message utility.Message) error {
 
 	function := message.Metadata["function"]
 	event := message.Metadata["event"]
+	service := message.Metadata["service"]
 	delete(message.Metadata, "function")
 	delete(message.Metadata, "event")
+	delete(message.Metadata, "service")
+	delete(message.Metadata, "device_id")
 
 	b, _ := json.Marshal(message.Metadata)
 
@@ -25,6 +28,7 @@ func LogMessage(message utility.Message) error {
 	model := m.Model.(*models.Log)
 	model.Function = function
 	model.Event = event
+	model.Service = service
 	model.Attributes = string(b)
 	model.Body = string(message.Body)
 	if !m.Create() {

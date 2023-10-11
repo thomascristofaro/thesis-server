@@ -41,7 +41,7 @@ provider:
     DBPass: ${file(../config.json):DBPass}
     DBName: ${file(./config.json):DBName}
     LogMessageQueueUrl: ${file(../config.json):LogMessageQueueUrl}
-    OnAfterPostingShptTopicArn: !GetAtt OnAfterPostingShptTopic.TopicArn
+    OnPostInvoiceTopicArn: !GetAtt OnPostInvoiceTopic.TopicArn
     ChangeOrderStatusQueueUrl: ${file(../config.json):ChangeOrderStatusQueueUrl}
 
 package:
@@ -116,14 +116,14 @@ functions:
     handler: bin/post-shipment
     events:
       - sns:
-          arn: ${file(../config.json):OnAfterPostingOrderTopicArn}
+          arn: ${file(../config.json):OnPostShipmentTopicArn}
 
 resources:
   Resources:
-    OnAfterPostingShptTopic:
+    OnPostInvoiceTopic:
       Type: AWS::SNS::Topic
       Properties:
-        TopicName: OnAfterPostingShpt
+        TopicName: OnPostInvoice
   Outputs:
-    OnAfterPostingShptTopicOutput:
-      Value: !GetAtt OnAfterPostingShptTopic.TopicArn
+    OnPostInvoiceTopicOutput:
+      Value: !GetAtt OnPostInvoiceTopic.TopicArn

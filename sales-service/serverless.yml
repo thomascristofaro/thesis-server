@@ -40,8 +40,9 @@ provider:
     DBUser: ${file(../config.json):DBUser}
     DBPass: ${file(../config.json):DBPass}
     DBName: ${file(./config.json):DBName}
+    FIREBASE_KEY: ${file(../config.json):FirebaseKey}
     LogMessageQueueUrl: ${file(../config.json):LogMessageQueueUrl}
-    OnAfterPostingOrderTopicArn: !GetAtt OnAfterPostingOrderTopic.TopicArn
+    OnPostShipmentTopicArn: !GetAtt OnPostShipmentTopic.TopicArn
 
 package:
   patterns:
@@ -142,12 +143,6 @@ functions:
         method: DELETE
         authorizer:
           name: cognitoAuth
-  Start:
-    handler: bin/start
-    events:
-      - httpApi:
-          path: /start
-          method: GET
   ChangeOrderStatus:
     handler: bin/change-order-status
     events:
@@ -157,10 +152,10 @@ functions:
 
 resources:
   Resources:
-    OnAfterPostingOrderTopic:
+    OnPostShipmentTopic:
       Type: AWS::SNS::Topic
       Properties:
-        TopicName: OnAfterPostingOrder
+        TopicName: OnPostShipment
     ChangeOrderStatusQueue:
       Type: AWS::SQS::Queue
       Properties:

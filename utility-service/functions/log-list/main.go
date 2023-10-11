@@ -29,6 +29,7 @@ func NewLogList() *LogList {
 		component.NewField("ID", "ID", &c.Model.ID),
 		component.NewField("Function", "Function", &c.Model.Function),
 		component.NewField("Event", "Event", &c.Model.Event),
+		component.NewField("Service", "Service", &c.Model.Service),
 		component.NewField("Attributes", "Attributes", &c.Model.Attributes),
 		component.NewField("Body", "Body", &c.Model.Body),
 	))

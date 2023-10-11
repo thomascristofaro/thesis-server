@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"strings"
 
@@ -46,15 +47,16 @@ func ConvertSNSEventToMessage(snsEvent events.SNSEvent) (Message, error) {
 	snsEntity := snsEvent.Records[0].SNS
 	return Message{
 		Body:     []byte(snsEntity.Message),
-		Metadata: convertMapInterfaceToMapString(snsEntity.MessageAttributes),
+		Metadata: convertSNSAttributeToMapString(snsEntity.MessageAttributes),
 	}, nil
 }
 
-func convertMapInterfaceToMapString(m map[string]interface{}) map[string]string {
+func convertSNSAttributeToMapString(m map[string]interface{}) map[string]string {
 	result := make(map[string]string)
 	for k, v := range m {
-		if s, ok := v.(string); ok {
-			result[k] = s
+		vmap := v.(map[string]interface{})
+		if vmap["Type"] == "String" {
+			result[k] = vmap["Value"].(string)
 		}
 	}
 	return result
@@ -75,7 +77,11 @@ func SendSNSMessage(ctx context.Context, env_topic string, message Message) erro
 		return err
 	}
 
-	topicARN := os.Getenv(env_topic)
+	topicARN, ok := os.LookupEnv(env_topic)
+	if !ok {
+		return errors.New(fmt.Sprintf("Environment variable %s not found", env_topic))
+	}
+
 	topic, err := pubsub.OpenTopic(ctx, "awssns:///"+topicARN+"?region=us-east-1")
 	if err != nil {
 		return err
@@ -102,8 +108,8 @@ func SendSQSMessage(ctx context.Context, env_topic string, message Message, fifo
 }
 
 func sendSQSLog(ctx context.Context, message Message) error {
-	if logURL, ok := os.LookupEnv("LogMessageQueueUrl"); ok {
-		if err := sendSQSMessageWithoutLog(ctx, logURL, message, true); err != nil {
+	if _, ok := os.LookupEnv("LogMessageQueueUrl"); ok {
+		if err := sendSQSMessageWithoutLog(ctx, "LogMessageQueueUrl", message, true); err != nil {
 			return err
 		}
 	}
@@ -111,7 +117,11 @@ func sendSQSLog(ctx context.Context, message Message) error {
 }
 
 func sendSQSMessageWithoutLog(ctx context.Context, env_topic string, message Message, fifo bool) error {
-	queueURL := os.Getenv(env_topic)
+	queueURL, ok := os.LookupEnv(env_topic)
+	if !ok {
+		return errors.New(fmt.Sprintf("Environment variable %s not found", env_topic))
+	}
+
 	if strings.HasPrefix(queueURL, "https://") {
 		queueURL = queueURL[8:]
 	}
