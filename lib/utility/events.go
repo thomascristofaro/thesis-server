@@ -10,6 +10,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-sdk-go/service/sqs"
+	"github.com/google/uuid"
 	"gocloud.dev/pubsub"
 	_ "gocloud.dev/pubsub/awssnssqs"
 )
@@ -19,26 +20,30 @@ type Message struct {
 	Metadata map[string]string
 }
 
-func HandlerSNSWithLogError(ctx context.Context, snsEvent events.SNSEvent, handler func(context.Context, Message) error) error {
+func HandlerSNSWithLogError(ctx context.Context, snsEvent events.SNSEvent, handler func(context.Context, *Message) error) error {
 	message, err := ConvertSNSEventToMessage(snsEvent)
 	if err != nil {
-		return SendSQSLogError(ctx, message, err)
+		SendSQSLogError(ctx, message, err)
+		return err
 	}
-	err = handler(ctx, message)
+	err = handler(ctx, &message)
 	if err != nil {
-		return SendSQSLogError(ctx, message, err)
+		SendSQSLogError(ctx, message, err)
+		return err
 	}
-	return nil
+	return err
 }
 
-func HandlerSQSWithLogError(ctx context.Context, sqsEvent events.SQSEvent, handler func(context.Context, Message) error) error {
+func HandlerSQSWithLogError(ctx context.Context, sqsEvent events.SQSEvent, handler func(context.Context, *Message) error) error {
 	message, err := ConvertSQSEventToMessage(sqsEvent)
 	if err != nil {
-		return SendSQSLogError(ctx, message, err)
+		SendSQSLogError(ctx, message, err)
+		return err
 	}
-	err = handler(ctx, message)
+	err = handler(ctx, &message)
 	if err != nil {
-		return SendSQSLogError(ctx, message, err)
+		SendSQSLogError(ctx, message, err)
+		return err
 	}
 	return nil
 }
@@ -97,7 +102,8 @@ func convertSQSAttributeToMapString(m map[string]events.SQSMessageAttribute) map
 }
 
 func SendSNSMessage(ctx context.Context, env_topic string, message Message) error {
-	if err := sendSQSLog(ctx, message); err != nil {
+	BuildLogMetadata("SENDING", message.Metadata["function"], env_topic, "SNS", &message)
+	if err := SendSQSLog(ctx, message); err != nil {
 		return err
 	}
 
@@ -125,28 +131,11 @@ func SendSNSMessage(ctx context.Context, env_topic string, message Message) erro
 }
 
 func SendSQSMessage(ctx context.Context, env_topic string, message Message, fifo bool) error {
-	if _, ok := message.Metadata["status"]; !ok {
-		message.Metadata["status"] = "SUCCESS"
-	}
-	if err := sendSQSLog(ctx, message); err != nil {
+	BuildLogMetadata("SENDING", message.Metadata["function"], env_topic, "SQS", &message)
+	if err := SendSQSLog(ctx, message); err != nil {
 		return err
 	}
 	return sendSQSMessageWithoutLog(ctx, env_topic, message, fifo)
-}
-
-func SendSQSLogError(ctx context.Context, message Message, err error) error {
-	message.Metadata["status"] = "ERROR"
-	message.Metadata["body"] = err.Error()
-	return sendSQSLog(ctx, message)
-}
-
-func sendSQSLog(ctx context.Context, message Message) error {
-	if _, ok := os.LookupEnv("LogMessageQueueUrl"); ok {
-		if err := sendSQSMessageWithoutLog(ctx, "LogMessageQueueUrl", message, true); err != nil {
-			return err
-		}
-	}
-	return nil
 }
 
 func sendSQSMessageWithoutLog(ctx context.Context, env_topic string, message Message, fifo bool) error {
@@ -186,5 +175,41 @@ func sendSQSMessageWithoutLog(ctx context.Context, env_topic string, message Mes
 		return err
 	}
 
+	return nil
+}
+
+// LOGGING
+func BuildLogMetadata(status string, function string, event string, service string, message *Message) {
+	message.Metadata["status"] = status
+	message.Metadata["function"] = function
+	message.Metadata["event"] = event
+	message.Metadata["service"] = service
+	if uuid_data, ok := message.Metadata["uuid"]; !ok || uuid_data == "" {
+		message.Metadata["uuid"] = uuid.New().String()
+	}
+}
+
+func SendSQSLogError(ctx context.Context, message Message, err error) error {
+	message.Metadata["status"] = "ERROR"
+	message.Body = []byte(err.Error())
+	// fmt.Printf("LOG ERROR: %s", err.Error())
+	return SendSQSLog(ctx, message)
+}
+
+func SendSQSLog(ctx context.Context, message Message) error {
+	if _, ok := os.LookupEnv("LogMessageQueueUrl"); ok {
+		body := map[string]interface{}{}
+		oldBody := map[string]interface{}{}
+		if err := json.Unmarshal(message.Body, &oldBody); err != nil {
+			body["body"] = string(message.Body)
+		} else {
+			body["body"] = oldBody
+		}
+		body["metadata"] = message.Metadata
+		message.Body, _ = json.Marshal(body)
+		if err := sendSQSMessageWithoutLog(ctx, "LogMessageQueueUrl", message, true); err != nil {
+			return err
+		}
+	}
 	return nil
 }

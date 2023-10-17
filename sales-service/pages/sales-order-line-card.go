@@ -16,7 +16,8 @@ func NewSalesOrderLineCard() *SalesOrderLineCard {
 	}
 	c.BasePage = *component.NewBasePage(c, "Sales Order Line Card", component.PageCard, "")
 	c.AddModel(c.Model)
-	c.AddKey("No")
+	c.AddKey("SalesOrderNo")
+	c.AddKey("LineNo")
 	c.AddSection(component.NewSection(
 		"Group1",
 		component.Group,

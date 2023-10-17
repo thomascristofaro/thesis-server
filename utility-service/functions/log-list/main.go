@@ -27,6 +27,8 @@ func NewLogList() *LogList {
 		component.Repeater,
 		"Repeater",
 		component.NewField("ID", "ID", &c.Model.ID),
+		component.NewField("Transaction", "Transaction", &c.Model.Transaction),
+		component.NewField("Status", "Status", &c.Model.Status),
 		component.NewField("Function", "Function", &c.Model.Function),
 		component.NewField("Event", "Event", &c.Model.Event),
 		component.NewField("Service", "Service", &c.Model.Service),

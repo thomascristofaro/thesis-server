@@ -93,6 +93,14 @@ func (p *SalesOrderCard) Button(queryParams map[string][]string) ([]byte, error)
 
 func PostSalesOrder(page component.Page, queryParams map[string][]string) ([]byte, error) {
 	p := page.(*SalesOrderCard)
+	response := "OK"
+
+	message := utility.Message{
+		Body:     []byte("NULL"),
+		Metadata: map[string]string{},
+	}
+	utility.BuildLogMetadata("START", "PostSalesOrder", "NULL", "LAMBDA", &message)
+	utility.SendSQSLog(context.Background(), message)
 
 	// Handle Button
 	device_id := queryParams["device_id"][0]
@@ -112,57 +120,54 @@ func PostSalesOrder(page component.Page, queryParams map[string][]string) ([]byt
 	}
 	p.ModelCtrl.Close()
 
-	// Build message
-	body, err := json.Marshal(map[string]interface{}{
-		"No": p.Model.No,
-	})
-	if err != nil {
-		return nil, err
-	}
-	metadata := map[string]string{
-		"device_id": device_id,
-		"function":  "PostSalesOrder",
-		"service":   "SNS",
-	}
+	// Build general metadata
+	message.Metadata["device_id"] = device_id
 
 	// registra spedizione
 	if p.Model.Status == "" || p.Model.Status == "INIT" {
-		metadata["event"] = "OnPostShipment"
-
 		// TODO è da costruire il body per la spedizione
-
-		// Send event to SNS
-		ctx := context.Background()
-		err = utility.SendSNSMessage(ctx,
-			"OnPostShipmentTopicArn",
-			utility.Message{
-				Body:     body,
-				Metadata: metadata,
-			})
+		body, err := json.Marshal(map[string]interface{}{
+			"No": p.Model.No,
+		})
 		if err != nil {
 			return nil, err
 		}
-		return json.Marshal("In registrazione spedizione")
+		message.Body = body
+
+		// Send event to SNS
+		err = utility.SendSNSMessage(
+			context.Background(),
+			"OnPostShipmentTopicArn",
+			message)
+		if err != nil {
+			return nil, err
+		}
+		response = "In registrazione spedizione"
 	}
 
 	// registra fattura
 	if p.Model.Status == "SPED" {
-		metadata["event"] = "OnPostInvoice"
-
 		// TODO è da costruire il body per la fattura
-
-		// Send event to SNS
-		ctx := context.Background()
-		err = utility.SendSNSMessage(ctx,
-			"OnPostInvoiceTopicArn",
-			utility.Message{
-				Body:     body,
-				Metadata: metadata,
-			})
+		body, err := json.Marshal(map[string]interface{}{
+			"No": p.Model.No,
+		})
 		if err != nil {
 			return nil, err
 		}
-		return json.Marshal("In registrazione fattura")
+		message.Body = body
+
+		// Send event to SNS
+		err = utility.SendSNSMessage(
+			context.Background(),
+			"OnPostInvoiceTopicArn",
+			message)
+		if err != nil {
+			return nil, err
+		}
+		response = "In registrazione fattura"
 	}
-	return json.Marshal("OK")
+
+	utility.BuildLogMetadata("END", "PostSalesOrder", "NULL", "LAMBDA", &message)
+	utility.SendSQSLog(context.Background(), message)
+	return json.Marshal(response)
 }

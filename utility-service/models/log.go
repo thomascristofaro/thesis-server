@@ -8,12 +8,13 @@ import (
 
 type Log struct {
 	gorm.Model
-	Status     string
-	Function   string
-	Event      string
-	Service    string
-	Attributes string
-	Body       string
+	Transaction string
+	Status      string
+	Function    string
+	Event       string
+	Service     string
+	Attributes  string
+	Body        string
 }
 
 func (c Log) DBType() database.DBType {

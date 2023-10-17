@@ -5,8 +5,8 @@ import (
 )
 
 type SalesOrderLine struct {
-	SalesOrderNo string `gorm:"primaryKey"`
-	LineNo       int    `gorm:"primaryKey"`
+	SalesOrderNo string `gorm:"column:salesorderno;primarykey"`
+	LineNo       int    `gorm:"column:lineno;primarykey"`
 	ItemNo       string
 	ItemName     string
 	Quantity     float64

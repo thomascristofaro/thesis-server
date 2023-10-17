@@ -20,17 +20,23 @@ func LogMessage(ctx context.Context, message utility.Message) error {
 	event := message.Metadata["event"]
 	service := message.Metadata["service"]
 	device_id := message.Metadata["device_id"]
+	uuid := message.Metadata["uuid"]
 	delete(message.Metadata, "status")
 	delete(message.Metadata, "function")
 	delete(message.Metadata, "event")
 	delete(message.Metadata, "service")
 	delete(message.Metadata, "device_id")
+	delete(message.Metadata, "uuid")
 
 	b, _ := json.Marshal(message.Metadata)
+	body := map[string]interface{}{}
+	json.Unmarshal(message.Body, &body)
+	message.Body, _ = json.Marshal(body["body"])
 
 	m.Open()
 	defer m.Close()
 	model := m.Model.(*models.Log)
+	model.Transaction = uuid
 	model.Status = status
 	model.Function = function
 	model.Event = event
@@ -41,13 +47,17 @@ func LogMessage(ctx context.Context, message utility.Message) error {
 		return m.GetLastError()
 	}
 
-	if status == "error" {
-		utility.SendFirebaseNotification(ctx, device_id,
+	if status == "ERROR" && device_id != "" {
+		fmt.Printf("Invio notifica di errore a device %s", device_id)
+		err := utility.SendFirebaseNotification(ctx, device_id,
 			"Error Log", "Error Log",
 			map[string]string{
 				"message": fmt.Sprintf("ERROR: %s", string(message.Body)),
 			},
 		)
+		if err != nil {
+			fmt.Printf("Errore invio notifica: %s", err.Error())
+		}
 	}
 	return nil
 }

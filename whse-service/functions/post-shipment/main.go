@@ -13,7 +13,10 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func PostShipment(ctx context.Context, message utility.Message) error {
+func PostShipment(ctx context.Context, message *utility.Message) error {
+	utility.BuildLogMetadata("START", "PostShipment", "NULL", "LAMBDA", message)
+	utility.SendSQSLog(ctx, *message)
+
 	device_id := message.Metadata["device_id"]
 
 	body := map[string]interface{}{}
@@ -84,6 +87,9 @@ func PostShipment(ctx context.Context, message utility.Message) error {
 	if err != nil {
 		return err
 	}
+
+	utility.BuildLogMetadata("END", "PostShipment", "NULL", "LAMBDA", message)
+	utility.SendSQSLog(ctx, *message)
 	return nil
 }
 

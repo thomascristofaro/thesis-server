@@ -13,7 +13,10 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func ChangeStatusOrder(ctx context.Context, message utility.Message) error {
+func ChangeStatusOrder(ctx context.Context, message *utility.Message) error {
+	utility.BuildLogMetadata("START", "ChangeStatusOrder", "NULL", "LAMBDA", message)
+	utility.SendSQSLog(ctx, *message)
+
 	device_id := message.Metadata["device_id"]
 	var status string
 
@@ -63,6 +66,8 @@ func ChangeStatusOrder(ctx context.Context, message utility.Message) error {
 	// if status == "SPED" {
 	// }
 
+	utility.BuildLogMetadata("END", "ChangeStatusOrder", "NULL", "LAMBDA", message)
+	utility.SendSQSLog(ctx, *message)
 	return nil
 }
 
