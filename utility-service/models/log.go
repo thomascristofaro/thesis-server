@@ -8,6 +8,7 @@ import (
 
 type Log struct {
 	gorm.Model
+	Status     string
 	Function   string
 	Event      string
 	Service    string

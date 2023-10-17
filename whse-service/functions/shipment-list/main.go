@@ -19,12 +19,12 @@ func main() {
 
 type ShipmentList struct {
 	component.BasePage
-	Model *models.ShipmentHeader
+	Model *models.Shipment
 }
 
 func NewShipmentList() *ShipmentList {
 	c := &ShipmentList{
-		Model: models.NewShipmentHeader(),
+		Model: models.NewShipment(),
 	}
 	c.BasePage = *component.NewBasePage(c, "Shipment List", component.PageList, "ShipmentCard")
 	c.AddModel(c.Model)
@@ -33,10 +33,11 @@ func NewShipmentList() *ShipmentList {
 		"repeater1",
 		component.Repeater,
 		"List",
-		component.NewField("No", "No.", &c.Model.No),
+		component.NewField("ID", "ID", &c.Model.ID),
+		component.NewField("OrderNo", "Order No.", &c.Model.OrderNo),
 		component.NewField("CustomerNo", "Customer No.", &c.Model.CustomerNo),
 		component.NewField("CustomerName", "Customer Name", &c.Model.CustomerName),
-		component.NewField("Amount", "Amount", &c.Model.Amount),
+		component.NewField("TotalWeight", "Total Weight", &c.Model.TotalWeight),
 	))
 	return c
 }

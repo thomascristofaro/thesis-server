@@ -30,22 +30,36 @@ func NewSalesOrderCard() *SalesOrderCard {
 		"General",
 		component.NewField("No", "No.", &c.Model.No),
 		component.NewField("Status", "Status", &c.Model.Status),
-		component.NewField("CustomerNo", "Customer No.", &c.Model.CustomerNo),
-		component.NewField("CustomerName", "Customer Name", &c.Model.CustomerName),
-		component.NewField("VATRegistrationNo", "VAT Registration No.", &c.Model.VATRegistrationNo),
 		// component.NewField("Date", "Date", &c.Model.Date),
 		component.NewField("Amount", "Amount", &c.Model.Amount),
 	))
 	c.AddSection(component.NewSection(
 		"Group2",
 		component.Group,
-		"Shipping & Invoice",
-		component.NewField("Address", "Address", &c.Model.Address),
-		component.NewField("City", "City", &c.Model.City),
-		component.NewField("Post Code", "PostCode", &c.Model.PostCode),
-		component.NewField("County", "County", &c.Model.County),
+		"Customer Data",
+		component.NewField("CustomerNo", "Customer No.", &c.Model.CustomerNo),
+		component.NewField("CustomerName", "Customer Name", &c.Model.CustomerName),
+		component.NewField("VATRegistrationNo", "VAT Registration No.", &c.Model.VATRegistrationNo),
 		component.NewField("EMail", "E-Mail", &c.Model.EMail),
 		component.NewField("PhoneNo", "Phone No.", &c.Model.PhoneNo),
+	))
+	c.AddSection(component.NewSection(
+		"Group3",
+		component.Group,
+		"Shipping",
+		component.NewField("ShipAddress", "Address", &c.Model.ShipAddress),
+		component.NewField("ShipCity", "City", &c.Model.ShipCity),
+		component.NewField("ShipPostCode", "Post Code", &c.Model.ShipPostCode),
+		component.NewField("ShipCounty", "County", &c.Model.ShipCounty),
+	))
+	c.AddSection(component.NewSection(
+		"Group4",
+		component.Group,
+		"Invoice",
+		component.NewField("BillAddress", "Address", &c.Model.BillAddress),
+		component.NewField("BillCity", "City", &c.Model.BillCity),
+		component.NewField("BillPostCode", "Post Code", &c.Model.BillPostCode),
+		component.NewField("BillCounty", "County", &c.Model.BillCounty),
 	))
 	c.AddSection(component.NewSubPageSection(
 		"Sub1",

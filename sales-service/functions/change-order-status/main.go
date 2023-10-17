@@ -13,12 +13,7 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func Handler(ctx context.Context, sqsEvent events.SQSEvent) error {
-	message, err := utility.ConvertSQSEventToMessage(sqsEvent)
-	if err != nil {
-		return err
-	}
-
+func ChangeStatusOrder(ctx context.Context, message utility.Message) error {
 	device_id := message.Metadata["device_id"]
 	var status string
 
@@ -33,10 +28,11 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 
 	// cambio stato ordine
 	body := map[string]interface{}{}
-	err = json.Unmarshal(message.Body, &body)
+	err := json.Unmarshal(message.Body, &body)
 	if err != nil {
 		return err
 	}
+	fmt.Printf("Body: %v", body)
 
 	m := database.NewModel(models.NewSalesOrderHeader())
 	if !m.Open() {
@@ -58,7 +54,8 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 		"Change Status",
 		fmt.Sprintf("Order %s status changed to %s", model.No, status),
 		map[string]string{
-			"action": "update",
+			"action":  "update",
+			"message": fmt.Sprintf("Order %s status changed to %s", model.No, status),
 		},
 	)
 
@@ -70,5 +67,7 @@ func Handler(ctx context.Context, sqsEvent events.SQSEvent) error {
 }
 
 func main() {
-	lambda.Start(Handler)
+	lambda.Start(func(ctx context.Context, sqsEvent events.SQSEvent) error {
+		return utility.HandlerSQSWithLogError(ctx, sqsEvent, ChangeStatusOrder)
+	})
 }

@@ -19,6 +19,30 @@ type Message struct {
 	Metadata map[string]string
 }
 
+func HandlerSNSWithLogError(ctx context.Context, snsEvent events.SNSEvent, handler func(context.Context, Message) error) error {
+	message, err := ConvertSNSEventToMessage(snsEvent)
+	if err != nil {
+		return SendSQSLogError(ctx, message, err)
+	}
+	err = handler(ctx, message)
+	if err != nil {
+		return SendSQSLogError(ctx, message, err)
+	}
+	return nil
+}
+
+func HandlerSQSWithLogError(ctx context.Context, sqsEvent events.SQSEvent, handler func(context.Context, Message) error) error {
+	message, err := ConvertSQSEventToMessage(sqsEvent)
+	if err != nil {
+		return SendSQSLogError(ctx, message, err)
+	}
+	err = handler(ctx, message)
+	if err != nil {
+		return SendSQSLogError(ctx, message, err)
+	}
+	return nil
+}
+
 func ConvertSQSEventToMessage(sqsEvent events.SQSEvent) (Message, error) {
 	if len(sqsEvent.Records) == 0 {
 		return Message{}, errors.New("NO SQS Event")
@@ -101,10 +125,19 @@ func SendSNSMessage(ctx context.Context, env_topic string, message Message) erro
 }
 
 func SendSQSMessage(ctx context.Context, env_topic string, message Message, fifo bool) error {
+	if _, ok := message.Metadata["status"]; !ok {
+		message.Metadata["status"] = "SUCCESS"
+	}
 	if err := sendSQSLog(ctx, message); err != nil {
 		return err
 	}
 	return sendSQSMessageWithoutLog(ctx, env_topic, message, fifo)
+}
+
+func SendSQSLogError(ctx context.Context, message Message, err error) error {
+	message.Metadata["status"] = "ERROR"
+	message.Metadata["body"] = err.Error()
+	return sendSQSLog(ctx, message)
 }
 
 func sendSQSLog(ctx context.Context, message Message) error {

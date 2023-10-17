@@ -3,14 +3,17 @@ package models
 import (
 	"thesis/lib/database"
 	"time"
+
+	"gorm.io/gorm"
 )
 
-type ShipmentHeader struct {
-	No           string `gorm:"primaryKey"`
+type Shipment struct {
+	gorm.Model
+	OrderNo      string
 	CustomerNo   string
 	CustomerName string
 	Date         time.Time
-	Amount       float64
+	TotalWeight  float64
 
 	VATRegistrationNo string
 	Address           string
@@ -21,10 +24,10 @@ type ShipmentHeader struct {
 	PhoneNo           string
 }
 
-func (c ShipmentHeader) DBType() database.DBType {
+func (c Shipment) DBType() database.DBType {
 	return database.SQL
 }
 
-func NewShipmentHeader() *ShipmentHeader {
-	return &ShipmentHeader{}
+func NewShipment() *Shipment {
+	return &Shipment{}
 }

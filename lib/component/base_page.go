@@ -3,6 +3,7 @@ package component
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"reflect"
 	"strings"
 	"thesis/lib/database"
@@ -59,6 +60,7 @@ func (p *BasePage) GetSchema() ([]byte, error) {
 }
 
 func (p *BasePage) Get(filters map[string][]string) ([]byte, error) {
+	fmt.Printf("Filters: %v", filters)
 	var recordset map[string]interface{}
 	var data []map[string]interface{}
 	if !p.ModelCtrl.Open() {

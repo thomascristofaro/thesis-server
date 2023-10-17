@@ -45,13 +45,17 @@ provider:
     OnPostShipmentTopicArn: !GetAtt OnPostShipmentTopic.TopicArn
 
 package:
+  individually: true
   patterns:
     - '!./**'
-    - ./bin/**
+    # - ./bin/**
 
 functions:
   CustomerList:
     handler: bin/customer-list
+    package:
+      patterns:
+        - ./bin/customer-list
     events:
     - httpApi:
         path: /customerlist/{param}
@@ -60,6 +64,9 @@ functions:
           name: cognitoAuth
   CustomerCard:
     handler: bin/customer-card
+    package:
+      patterns:
+        - ./bin/customer-card
     events:
     - httpApi:
         path: /customercard/{param}
@@ -83,6 +90,9 @@ functions:
           name: cognitoAuth
   SalesOrderList:
     handler: bin/sales-order-list
+    package:
+      patterns:
+        - ./bin/sales-order-list
     events:
     - httpApi:
         path: /salesorderlist/{param}
@@ -91,6 +101,9 @@ functions:
           name: cognitoAuth
   SalesOrderCard:
     handler: bin/sales-order-card
+    package:
+      patterns:
+        - ./bin/sales-order-card
     events:
     - httpApi:
         path: /salesordercard/{param}
@@ -114,6 +127,9 @@ functions:
           name: cognitoAuth
   SalesOrderLineList:
     handler: bin/sales-order-line-list
+    package:
+      patterns:
+        - ./bin/sales-order-line-list
     events:
     - httpApi:
         path: /salesorderlinelist/{param}
@@ -122,6 +138,9 @@ functions:
           name: cognitoAuth
   SalesOrderLineCard:
     handler: bin/sales-order-line-card
+    package:
+      patterns:
+        - ./bin/sales-order-line-card
     events:
     - httpApi:
         path: /salesorderlinecard/{param}
@@ -145,6 +164,9 @@ functions:
           name: cognitoAuth
   ChangeOrderStatus:
     handler: bin/change-order-status
+    package:
+      patterns:
+        - ./bin/change-order-status
     events:
       - sqs:
           arn: !GetAtt ChangeOrderStatusQueue.Arn

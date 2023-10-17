@@ -19,20 +19,23 @@ func main() {
 
 	// createTables(database.NewConnParamSQLFromEnv(), []database.ModelDB{models.Log{}})
 
-	page := pages.NewSalesOrderCard()
-	queryParams := map[string][]string{
-		"device_id": []string{"eKtDSgRajJNmpcgKSQDTod:APA91bEE-t0pxZpNS5uG4jQEkV0I0P58fBBavNf9MldWxVp8xQJunv5UR7tReQ_seAWK1IxsdrinYANyqies47tmKpNStemyFTccwZiJJ8itsACJBQYlMVTw_rfG5ZO-_iIdgX5Y_QEZ"},
-		"No":        []string{"OR0001"},
-	}
-	buff, err := pages.PostSalesOrder(page, queryParams)
-	if err != nil {
-		fmt.Println(err)
-	} else {
-		fmt.Println(string(buff))
-	}
+	// page := pages.NewSalesOrderCard()
+	// queryParams := map[string][]string{
+	// 	"device_id": []string{"eKtDSgRajJNmpcgKSQDTod:APA91bEE-t0pxZpNS5uG4jQEkV0I0P58fBBavNf9MldWxVp8xQJunv5UR7tReQ_seAWK1IxsdrinYANyqies47tmKpNStemyFTccwZiJJ8itsACJBQYlMVTw_rfG5ZO-_iIdgX5Y_QEZ"},
+	// 	"No":        []string{"OR0001"},
+	// }
+	// buff, err := pages.PostSalesOrder(page, queryParams)
+	// if err != nil {
+	// 	fmt.Println(err)
+	// } else {
+	// 	fmt.Println(string(buff))
+	// }
 
-	// var filters map[string][]string
-	// TestGetPage(page, filters)
+	var filters map[string][]string
+	filters = map[string][]string{
+		"SalesOrderNo": []string{"ORD0001"},
+	}
+	TestGetPage(pages.NewSalesOrderLineList(), filters)
 }
 
 // config["foo"].(string)

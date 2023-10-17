@@ -6,20 +6,25 @@ import (
 )
 
 type SalesOrderHeader struct {
-	No           string `gorm:"primaryKey"`
-	CustomerNo   string
-	CustomerName string
-	Status       string
-	Date         time.Time
-	Amount       float64
-
+	No                string `gorm:"primaryKey"`
+	CustomerNo        string
+	CustomerName      string
+	Status            string
+	Date              time.Time
+	Amount            float64
 	VATRegistrationNo string
-	Address           string
-	City              string
-	PostCode          string
-	County            string
 	EMail             string
 	PhoneNo           string
+
+	ShipAddress  string
+	ShipCity     string
+	ShipPostCode string
+	ShipCounty   string
+
+	BillAddress  string
+	BillCity     string
+	BillPostCode string
+	BillCounty   string
 }
 
 func (c SalesOrderHeader) DBType() database.DBType {
