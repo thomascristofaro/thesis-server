@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"thesis/lib/component"
+	"thesis/lib/database"
 	"thesis/lib/utility"
 	"thesis/sales-service/models"
 
@@ -125,9 +126,18 @@ func PostSalesOrder(page component.Page, queryParams map[string][]string) ([]byt
 
 	// registra spedizione
 	if p.Model.Status == "" || p.Model.Status == "INIT" {
-		// TODO è da costruire il body per la spedizione
 		body, err := json.Marshal(map[string]interface{}{
-			"No": p.Model.No,
+			"No":                p.Model.No,
+			"Weight":            p.Model.Weight,
+			"CustomerNo":        p.Model.CustomerNo,
+			"CustomerName":      p.Model.CustomerName,
+			"Address":           p.Model.ShipAddress,
+			"City":              p.Model.ShipCity,
+			"PostCode":          p.Model.ShipPostCode,
+			"County":            p.Model.ShipCounty,
+			"VATRegistrationNo": p.Model.VATRegistrationNo,
+			"EMail":             p.Model.EMail,
+			"PhoneNo":           p.Model.PhoneNo,
 		})
 		if err != nil {
 			return nil, err
@@ -147,9 +157,40 @@ func PostSalesOrder(page component.Page, queryParams map[string][]string) ([]byt
 
 	// registra fattura
 	if p.Model.Status == "SPED" {
-		// TODO è da costruire il body per la fattura
+		lines := []map[string]interface{}{}
+		m := database.NewModel(models.NewSalesOrderLine())
+		if !m.Open() {
+			return nil, m.GetLastError()
+		}
+
+		m.SetFilter("SalesOrderNo", database.EQUAL, p.Model.No)
+		if m.Find() {
+			for m.Next() {
+				line := m.Model.(*models.SalesOrderLine)
+				lines = append(lines, map[string]interface{}{
+					"ItemNo":    line.ItemNo,
+					"ItemName":  line.ItemName,
+					"Quantity":  line.Quantity,
+					"UnitPrice": line.UnitPrice,
+					"Ammount":   line.Amount,
+				})
+			}
+		}
+		m.Close()
+
 		body, err := json.Marshal(map[string]interface{}{
-			"No": p.Model.No,
+			"No":                p.Model.No,
+			"Amount":            p.Model.Amount,
+			"CustomerNo":        p.Model.CustomerNo,
+			"CustomerName":      p.Model.CustomerName,
+			"Address":           p.Model.BillAddress,
+			"City":              p.Model.BillCity,
+			"PostCode":          p.Model.BillPostCode,
+			"County":            p.Model.BillCounty,
+			"VATRegistrationNo": p.Model.VATRegistrationNo,
+			"EMail":             p.Model.EMail,
+			"PhoneNo":           p.Model.PhoneNo,
+			"Lines":             lines,
 		})
 		if err != nil {
 			return nil, err

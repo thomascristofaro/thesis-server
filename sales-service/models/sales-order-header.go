@@ -12,6 +12,7 @@ type SalesOrderHeader struct {
 	Status            string
 	Date              time.Time
 	Amount            float64
+	Weight            float64
 	VATRegistrationNo string
 	EMail             string
 	PhoneNo           string

@@ -39,8 +39,8 @@ func PostShipment(ctx context.Context, message *utility.Message) error {
 	if model.CustomerNo, ok = body["CustomerNo"].(string); !ok {
 		return errorFieldMissing("CustomerNo")
 	}
-	if model.TotalWeight, ok = body["TotalWeight"].(float64); !ok {
-		return errorFieldMissing("TotalWeight")
+	if model.Weight, ok = body["Weight"].(float64); !ok {
+		return errorFieldMissing("Weight")
 	}
 	if model.Address, ok = body["Address"].(string); !ok {
 		return errorFieldMissing("Address")

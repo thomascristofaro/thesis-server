@@ -28,7 +28,7 @@ func NewShipmentList() *ShipmentList {
 	}
 	c.BasePage = *component.NewBasePage(c, "Shipment List", component.PageList, "ShipmentCard")
 	c.AddModel(c.Model)
-	c.AddKey("No")
+	c.AddKey("ID")
 	c.AddSection(component.NewSection(
 		"repeater1",
 		component.Repeater,
@@ -37,7 +37,7 @@ func NewShipmentList() *ShipmentList {
 		component.NewField("OrderNo", "Order No.", &c.Model.OrderNo),
 		component.NewField("CustomerNo", "Customer No.", &c.Model.CustomerNo),
 		component.NewField("CustomerName", "Customer Name", &c.Model.CustomerName),
-		component.NewField("TotalWeight", "Total Weight", &c.Model.TotalWeight),
+		component.NewField("Weight", "Weight", &c.Model.Weight),
 	))
 	return c
 }

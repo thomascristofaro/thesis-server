@@ -14,7 +14,9 @@ type Customer struct {
 	County            string
 	EMail             string
 	PhoneNo           string
-	Balance           float64 //Sum("Detailed Cust. Ledg. Entry".Amount WHERE("Customer No." = FIELD("No."),
+	WebSite           string
+	Balance           float64
+	// vado a sommare quando nel change status order fatturo l'ordine
 }
 
 func (c Customer) DBType() database.DBType {

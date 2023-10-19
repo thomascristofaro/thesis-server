@@ -14,13 +14,14 @@ import (
 )
 
 func ChangeStatusOrder(ctx context.Context, message *utility.Message) error {
+	function := message.Metadata["function"]
 	utility.BuildLogMetadata("START", "ChangeStatusOrder", "NULL", "LAMBDA", message)
 	utility.SendSQSLog(ctx, *message)
 
 	device_id := message.Metadata["device_id"]
 	var status string
 
-	switch message.Metadata["function"] {
+	switch function {
 	case "PostShipment":
 		status = "SPED"
 	case "PostInvoice":
@@ -63,8 +64,56 @@ func ChangeStatusOrder(ctx context.Context, message *utility.Message) error {
 	)
 
 	// registra fattura
-	// if status == "SPED" {
-	// }
+	if status == "SPED" {
+		lines := []map[string]interface{}{}
+		m := database.NewModel(models.NewSalesOrderLine())
+		if !m.Open() {
+			return m.GetLastError()
+		}
+
+		m.SetFilter("SalesOrderNo", database.EQUAL, model.No)
+		if m.Find() {
+			for m.Next() {
+				line := m.Model.(*models.SalesOrderLine)
+				lines = append(lines, map[string]interface{}{
+					"ItemNo":    line.ItemNo,
+					"ItemName":  line.ItemName,
+					"Quantity":  line.Quantity,
+					"UnitPrice": line.UnitPrice,
+					"Ammount":   line.Amount,
+				})
+			}
+		}
+		m.Close()
+
+		body, err := json.Marshal(map[string]interface{}{
+			"No":                model.No,
+			"Amount":            model.Amount,
+			"CustomerNo":        model.CustomerNo,
+			"CustomerName":      model.CustomerName,
+			"Address":           model.BillAddress,
+			"City":              model.BillCity,
+			"PostCode":          model.BillPostCode,
+			"County":            model.BillCounty,
+			"VATRegistrationNo": model.VATRegistrationNo,
+			"EMail":             model.EMail,
+			"PhoneNo":           model.PhoneNo,
+			"Lines":             lines,
+		})
+		if err != nil {
+			return err
+		}
+		message.Body = body
+
+		// Send event to SNS
+		err = utility.SendSNSMessage(
+			context.Background(),
+			"OnPostInvoiceTopicArn",
+			*message)
+		if err != nil {
+			return err
+		}
+	}
 
 	utility.BuildLogMetadata("END", "ChangeStatusOrder", "NULL", "LAMBDA", message)
 	utility.SendSQSLog(ctx, *message)

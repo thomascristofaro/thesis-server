@@ -7,6 +7,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"thesis/financial-service/models"
 	"thesis/lib/component"
 	"thesis/lib/database"
 )
@@ -14,9 +15,9 @@ import (
 func main() {
 
 	readConfig()
-	os.Setenv("DBName", "utility")
+	os.Setenv("DBName", "financial")
 
-	// createTables(database.NewConnParamSQLFromEnv(), []database.ModelDB{models.Log{}})
+	createTables(database.NewConnParamSQLFromEnv(), []database.ModelDB{models.InvoiceHeader{}, models.InvoiceLine{}})
 
 	// page := pages.NewSalesOrderCard()
 	// queryParams := map[string][]string{

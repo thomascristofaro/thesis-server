@@ -24,6 +24,7 @@ func NewCustomerCard() *CustomerCard {
 		component.NewField("No", "No.", &c.Model.No),
 		component.NewField("Name", "Name", &c.Model.Name),
 		component.NewField("VATRegistrationNo", "VAT Registration No.", &c.Model.VATRegistrationNo),
+		component.NewField("WebSite", "Web Site", &c.Model.WebSite),
 		component.NewField("Balance", "Balance", &c.Model.Balance),
 	))
 	c.AddSection(component.NewSection(

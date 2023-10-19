@@ -48,7 +48,6 @@ func LogMessage(ctx context.Context, message utility.Message) error {
 	}
 
 	if status == "ERROR" && device_id != "" {
-		fmt.Printf("Invio notifica di errore a device %s", device_id)
 		err := utility.SendFirebaseNotification(ctx, device_id,
 			"Error Log", "Error Log",
 			map[string]string{

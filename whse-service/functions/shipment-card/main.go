@@ -28,7 +28,7 @@ func NewShipmentCard() *ShipmentCard {
 	}
 	c.BasePage = *component.NewBasePage(c, "Shipment Card", component.PageCard, "")
 	c.AddModel(c.Model)
-	c.AddKey("No")
+	c.AddKey("ID")
 	c.AddSection(component.NewSection(
 		"Group1",
 		component.Group,
@@ -38,7 +38,7 @@ func NewShipmentCard() *ShipmentCard {
 		component.NewField("CustomerNo", "Customer No.", &c.Model.CustomerNo),
 		component.NewField("CustomerName", "Customer Name", &c.Model.CustomerName),
 		component.NewField("VATRegistrationNo", "VAT Registration No.", &c.Model.VATRegistrationNo),
-		component.NewField("TotalWeight", "Total Weight", &c.Model.TotalWeight),
+		component.NewField("Weight", "Weight", &c.Model.Weight),
 		// component.NewField("Date", "Date", &c.Model.Date),
 	))
 	c.AddSection(component.NewSection(

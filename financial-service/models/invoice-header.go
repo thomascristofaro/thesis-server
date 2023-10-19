@@ -7,6 +7,7 @@ import (
 
 type InvoiceHeader struct {
 	No           string `gorm:"primaryKey"`
+	OrderNo      string
 	CustomerNo   string
 	CustomerName string
 	Date         time.Time

@@ -43,6 +43,7 @@ provider:
     FIREBASE_KEY: ${file(../config.json):FirebaseKey}
     LogMessageQueueUrl: ${file(../config.json):LogMessageQueueUrl}
     OnPostShipmentTopicArn: !GetAtt OnPostShipmentTopic.TopicArn
+    OnPostInvoiceTopicArn: ${file(../config.json):OnPostInvoiceTopicArn}
 
 package:
   individually: true

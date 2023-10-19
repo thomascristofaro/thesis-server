@@ -13,7 +13,7 @@ type Shipment struct {
 	CustomerNo   string
 	CustomerName string
 	Date         time.Time
-	TotalWeight  float64
+	Weight       float64
 
 	VATRegistrationNo string
 	Address           string
