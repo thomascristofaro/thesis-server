@@ -28,13 +28,13 @@ func NewInvoiceLineList() *InvoiceLineList {
 	}
 	c.BasePage = *component.NewBasePage(c, "Lines", component.PageList, "InvoiceLineCard")
 	c.AddModel(c.Model)
-	c.AddKey("InvoiceNo")
+	c.AddKey("InvoiceID")
 	c.AddKey("LineNo")
 	c.AddSection(component.NewSection(
 		"repeater1",
 		component.Repeater,
 		"List",
-		component.NewField("InvoiceNo", "Invoice No.", &c.Model.InvoiceNo),
+		component.NewField("InvoiceID", "Invoice ID", &c.Model.InvoiceID),
 		component.NewField("LineNo", "Line No.", &c.Model.LineNo),
 		component.NewField("ItemNo", "Item No.", &c.Model.ItemNo),
 		component.NewField("ItemName", "Item Name", &c.Model.ItemName),

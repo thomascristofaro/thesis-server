@@ -5,8 +5,8 @@ import (
 )
 
 type InvoiceLine struct {
-	InvoiceNo string `gorm:"primaryKey"`
-	LineNo    int    `gorm:"primaryKey"`
+	InvoiceID uint `gorm:"column:invoiceid;primaryKey"`
+	LineNo    int  `gorm:"column:lineno;primaryKey"`
 	ItemNo    string
 	ItemName  string
 	Quantity  float64

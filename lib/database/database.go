@@ -23,6 +23,9 @@ type Database interface {
 	Update(value interface{}) (err error)
 	Delete(value interface{}) (err error)
 	Find(value interface{}, filters []Filter) (it IteratorDB, err error)
+	BeginTransaction() (err error)
+	CommitTransaction() (err error)
+	RollbackTransaction() (err error)
 }
 
 type ConnectionParameters interface {
@@ -175,6 +178,29 @@ func (m *ModelCtrl) Open() bool {
 func (m *ModelCtrl) Close() bool {
 	m.lastErr = m.db.Close()
 	return m.lastErr == nil
+}
+
+func (m *ModelCtrl) BeginTransaction() bool {
+	m.lastErr = m.db.BeginTransaction()
+	return m.lastErr == nil
+}
+
+func (m *ModelCtrl) CommitTransaction() bool {
+	m.lastErr = m.db.CommitTransaction()
+	return m.lastErr == nil
+}
+
+func (m *ModelCtrl) RollbackTransaction() bool {
+	m.lastErr = m.db.RollbackTransaction()
+	return m.lastErr == nil
+}
+
+func (m *ModelCtrl) SetDB(db Database) {
+	m.db = db
+}
+
+func (m *ModelCtrl) GetDB() Database {
+	return m.db
 }
 
 //FIELDS

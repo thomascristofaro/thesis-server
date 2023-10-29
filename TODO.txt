@@ -1,0 +1,29 @@
+SERVER:
+    Customer model con sito web V
+    Body Shipment in PostSalesOrder V
+    Creazione Shipment in PostShipment V
+    Check Invoice Model
+    Body Invoice in PostSalesOrder
+    
+
+
+
+
+intrdozuione 
+	scaletta di come è fatta la tesi
+Essentials
+	Architettura e tecnologia dipende dalla loro lunghezza, se lasciarli insieme o no
+
+client application
+
+Caso d'uso
+	Inserimento e modifica record
+	Registrazione
+
+conclusioni
+	cosa si è fatto e ottenuto e sviluppi futuri, cosa si può ampliare
+
+
+abstract: 200/300 parole + contesto + cosa si è sviluppato e i risultati ottenuti
+
+dall'inizio delle discussioni 5gg

@@ -28,12 +28,13 @@ func NewInvoiceLineCard() *InvoiceLineCard {
 	}
 	c.BasePage = *component.NewBasePage(c, "Invoice Line Card", component.PageCard, "")
 	c.AddModel(c.Model)
-	c.AddKey("No")
+	c.AddKey("InvoiceID")
+	c.AddKey("LineNo")
 	c.AddSection(component.NewSection(
 		"Group1",
 		component.Group,
 		"General",
-		component.NewField("InvoiceNo", "Invoice No.", &c.Model.InvoiceNo),
+		component.NewField("InvoiceID", "Invoice ID", &c.Model.InvoiceID),
 		component.NewField("LineNo", "Line No.", &c.Model.LineNo),
 		component.NewField("ItemNo", "Item No.", &c.Model.ItemNo),
 		component.NewField("ItemName", "Item Name", &c.Model.ItemName),

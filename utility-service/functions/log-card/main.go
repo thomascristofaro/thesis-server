@@ -10,22 +10,22 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-type LogList struct {
+type LogCard struct {
 	component.BasePage
 	Model *models.Log
 }
 
-func NewLogList() *LogList {
-	c := &LogList{
+func NewLogList() *LogCard {
+	c := &LogCard{
 		Model: models.NewLog(),
 	}
-	c.BasePage = *component.NewBasePage(c, "Log List", component.PageList, "LogCard")
+	c.BasePage = *component.NewBasePage(c, "Log Card", component.PageCard, "")
 	c.AddModel(c.Model)
 	c.AddKey("ID")
 	c.AddSection(component.NewSection(
-		"repeater",
-		component.Repeater,
-		"Repeater",
+		"group",
+		component.Group,
+		"General",
 		component.NewField("ID", "ID", &c.Model.ID),
 		component.NewField("Transaction", "Transaction", &c.Model.Transaction),
 		component.NewField("Status", "Status", &c.Model.Status),

@@ -93,6 +93,29 @@ functions:
         method: GET
         authorizer:
           name: cognitoAuth
+  LogCard:
+    handler: bin/log-card
+    events:
+    - httpApi:
+        path: /logcard/{param}
+        method: GET
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /logcard
+        method: POST
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /logcard
+        method: PATCH
+        authorizer:
+          name: cognitoAuth
+    - httpApi:
+        path: /logcard
+        method: DELETE
+        authorizer:
+          name: cognitoAuth
   LogMessage:
     handler: bin/log-message
     events:

@@ -37,13 +37,17 @@ func ChangeStatusOrder(ctx context.Context, message *utility.Message) error {
 		return err
 	}
 	fmt.Printf("Body: %v", body)
+	no, ok := body["No"].(string)
+	if !ok {
+		return errors.New("Field missing: No")
+	}
 
 	m := database.NewModel(models.NewSalesOrderHeader())
 	if !m.Open() {
 		return m.GetLastError()
 	}
 	defer m.Close()
-	m.SetFilter("No", database.EQUAL, body["No"].(string))
+	m.SetFilter("No", database.EQUAL, no)
 	if !m.Find() || !m.Next() {
 		return m.GetLastError()
 	}
@@ -80,7 +84,7 @@ func ChangeStatusOrder(ctx context.Context, message *utility.Message) error {
 					"ItemName":  line.ItemName,
 					"Quantity":  line.Quantity,
 					"UnitPrice": line.UnitPrice,
-					"Ammount":   line.Amount,
+					"Amount":    line.Amount,
 				})
 			}
 		}

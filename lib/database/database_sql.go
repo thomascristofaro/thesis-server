@@ -112,6 +112,19 @@ func (d *DatabaseSQL) Close() error {
 	return d.DB.Close()
 }
 
+func (d *DatabaseSQL) BeginTransaction() (err error) {
+	d.GormDB = d.GormDB.Begin()
+	return d.GormDB.Error
+}
+
+func (d *DatabaseSQL) CommitTransaction() (err error) {
+	return d.GormDB.Commit().Error
+}
+
+func (d *DatabaseSQL) RollbackTransaction() (err error) {
+	return d.GormDB.Rollback().Error
+}
+
 func (d *DatabaseSQL) Get(value interface{}) (err error) {
 	//TODO check chiave primaria
 	result := d.GormDB.First(value)

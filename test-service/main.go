@@ -14,10 +14,10 @@ import (
 
 func main() {
 
-	readConfig()
+	ReadConfig()
 	os.Setenv("DBName", "financial")
 
-	createTables(database.NewConnParamSQLFromEnv(), []database.ModelDB{models.InvoiceHeader{}, models.InvoiceLine{}})
+	createTables(database.NewConnParamSQLFromEnv(), []database.ModelDB{models.InvoiceLine{}})
 
 	// page := pages.NewSalesOrderCard()
 	// queryParams := map[string][]string{
@@ -50,7 +50,7 @@ func main() {
 }
 
 // config["foo"].(string)
-func readConfig() map[string]interface{} {
+func ReadConfig() map[string]interface{} {
 	// Read the JSON file
 	data, err := os.ReadFile("../config.json")
 	if err != nil {

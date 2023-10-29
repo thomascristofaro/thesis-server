@@ -28,12 +28,12 @@ func NewInvoiceCard() *InvoiceCard {
 	}
 	c.BasePage = *component.NewBasePage(c, "Invoice Card", component.PageCard, "")
 	c.AddModel(c.Model)
-	c.AddKey("No")
+	c.AddKey("ID")
 	c.AddSection(component.NewSection(
 		"Group1",
 		component.Group,
 		"General",
-		component.NewField("No", "No.", &c.Model.No),
+		component.NewField("ID", "ID", &c.Model.ID),
 		component.NewField("CustomerNo", "Customer No.", &c.Model.CustomerNo),
 		component.NewField("CustomerName", "Customer Name", &c.Model.CustomerName),
 		component.NewField("VATRegistrationNo", "VAT Registration No.", &c.Model.VATRegistrationNo),
@@ -59,9 +59,9 @@ func NewInvoiceCard() *InvoiceCard {
 			"height":  400,
 			"filters": []interface{}{
 				map[string]interface{}{
-					"id":    "InvoiceNo",
+					"id":    "InvoiceID",
 					"value": 0,
-					"field": "No",
+					"field": "ID",
 				},
 			},
 		},

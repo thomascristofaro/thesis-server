@@ -85,6 +85,18 @@ func (d *DatabaseNoSQL) Close() error {
 	return d.Coll.Close()
 }
 
+func (d *DatabaseNoSQL) BeginTransaction() (err error) {
+	return nil
+}
+
+func (d *DatabaseNoSQL) CommitTransaction() (err error) {
+	return nil
+}
+
+func (d *DatabaseNoSQL) RollbackTransaction() (err error) {
+	return nil
+}
+
 func (d *DatabaseNoSQL) Get(value interface{}) (err error) {
 	//TODO check chiave primaria
 	return d.Coll.Get(d.GetContext(), value)

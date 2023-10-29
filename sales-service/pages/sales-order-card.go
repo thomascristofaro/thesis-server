@@ -172,7 +172,7 @@ func PostSalesOrder(page component.Page, queryParams map[string][]string) ([]byt
 					"ItemName":  line.ItemName,
 					"Quantity":  line.Quantity,
 					"UnitPrice": line.UnitPrice,
-					"Ammount":   line.Amount,
+					"Amount":    line.Amount,
 				})
 			}
 		}

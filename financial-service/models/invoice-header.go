@@ -3,10 +3,12 @@ package models
 import (
 	"thesis/lib/database"
 	"time"
+
+	"gorm.io/gorm"
 )
 
 type InvoiceHeader struct {
-	No           string `gorm:"primaryKey"`
+	gorm.Model
 	OrderNo      string
 	CustomerNo   string
 	CustomerName string
