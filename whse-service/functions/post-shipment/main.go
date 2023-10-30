@@ -67,7 +67,8 @@ func PostShipment(ctx context.Context, message *utility.Message) error {
 	// cambia stato ordine
 	var bodyBuff []byte
 	bodyBuff, err = json.Marshal(map[string]string{
-		"No": model.OrderNo,
+		"No":     model.OrderNo,
+		"Status": "SPED",
 	})
 	if err != nil {
 		return err
