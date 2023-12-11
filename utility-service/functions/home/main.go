@@ -52,10 +52,9 @@ func (p *Home) Get(filters map[string][]string) ([]byte, error) {
 	var data []map[string]interface{}
 
 	// sarebbe da fare una query a db e prendere le informazioni e ridarle così al client
-	data = append(data, map[string]interface{}{"label": "Biggest", "value": 45})
-	data = append(data, map[string]interface{}{"label": "Big", "value": 38})
-	data = append(data, map[string]interface{}{"label": "Small", "value": 12})
-	data = append(data, map[string]interface{}{"label": "Smallest", "value": 5})
+	data = append(data, map[string]interface{}{"label": "CRONUS IT S.p.A.", "value": 45})
+	data = append(data, map[string]interface{}{"label": "Erdman Group", "value": 38})
+	data = append(data, map[string]interface{}{"label": "Hand Ltd", "value": 17})
 
 	data = append(data, map[string]interface{}{"x": 0, "y": 3})
 	data = append(data, map[string]interface{}{"x": 2.6, "y": 2})
